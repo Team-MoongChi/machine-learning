@@ -1,0 +1,26 @@
+services:
+  mariadb:
+    container_name: machine-learning-mariadb
+    image: registryhj/mariadb:10.11
+    environment:
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+    ports:
+      - '3306:3306'
+    volumes:
+      - machine-learning-mariadb:/var/lib/mysql
+    networks:
+      - machine-learning-network
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+volumes:
+  machine-learning-mariadb:
+    driver: local
+
+networks:
+  machine-learning-network:
+    driver: bridge
