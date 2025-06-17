@@ -1181,6 +1181,14 @@ wheels = [
 ]
 
 [[package]]
+name = "events"
+version = "0.5"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/25/ed/e47dec0626edd468c84c04d97769e7ab4ea6457b7f54dcb3f72b17fcd876/Events-0.5-py3-none-any.whl", hash = "sha256:a7286af378ba3e46640ac9825156c93bdba7502174dd696090fdfcd4d80a1abd", size = 6758, upload-time = "2023-07-31T08:23:13.645Z" },
+]
+
+[[package]]
 name = "executing"
 version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1502,6 +1510,9 @@ dependencies = [
     { name = "uritemplate" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/35/99/237cd2510aecca9fabb54007e58553274cc43cb3c18512ee1ea574d11b87/google_api_python_client-2.171.0.tar.gz", hash = "sha256:057a5c08d28463c6b9eb89746355de5f14b7ed27a65c11fdbf1d06c66bb66b23", size = 13028937, upload-time = "2025-06-03T18:57:38.732Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/79/db/c397e3eb3ea18f423855479d0a5852bdc9c3f644e3d4194931fa664a70b4/google_api_python_client-2.171.0-py3-none-any.whl", hash = "sha256:c9c9b76f561e9d9ac14e54a9e2c0842876201d5b96e69e48f967373f0784cbe9", size = 13547393, upload-time = "2025-06-10T02:14:38.225Z" },
+]
 
 [[package]]
 name = "google-auth"
@@ -2216,6 +2227,7 @@ dependencies = [
     { name = "nbformat" },
     { name = "numpy" },
     { name = "opencv-python" },
+    { name = "opensearch-py" },
     { name = "pandas" },
     { name = "pillow" },
     { name = "pingouin" },
@@ -2261,6 +2273,7 @@ requires-dist = [
     { name = "nbformat", specifier = ">=4.2.0" },
     { name = "numpy", specifier = ">=2.2.6" },
     { name = "opencv-python", specifier = ">=4.11.0.86" },
+    { name = "opensearch-py", specifier = ">=3.0.0" },
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "pillow", specifier = ">=11.2.1" },
     { name = "pingouin", specifier = ">=0.5.5" },
@@ -2892,6 +2905,22 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/dd/5c/c139a7876099916879609372bfa513b7f1257f7f1a908b0bdc1c2328241b/opencv_python_headless-4.11.0.86-cp37-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:0e0a27c19dd1f40ddff94976cfe43066fbbe9dfbb2ec1907d66c19caef42a57b", size = 49969856, upload-time = "2025-01-16T13:53:29.654Z" },
     { url = "https://files.pythonhosted.org/packages/95/dd/ed1191c9dc91abcc9f752b499b7928aacabf10567bb2c2535944d848af18/opencv_python_headless-4.11.0.86-cp37-abi3-win32.whl", hash = "sha256:f447d8acbb0b6f2808da71fddd29c1cdd448d2bc98f72d9bb78a7a898fc9621b", size = 29324425, upload-time = "2025-01-16T13:52:49.048Z" },
     { url = "https://files.pythonhosted.org/packages/86/8a/69176a64335aed183529207ba8bc3d329c2999d852b4f3818027203f50e6/opencv_python_headless-4.11.0.86-cp37-abi3-win_amd64.whl", hash = "sha256:6c304df9caa7a6a5710b91709dd4786bf20a74d57672b3c31f7033cc638174ca", size = 39402386, upload-time = "2025-01-16T13:52:56.418Z" },
+]
+
+[[package]]
+name = "opensearch-py"
+version = "3.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "events" },
+    { name = "python-dateutil" },
+    { name = "requests" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b8/58/ecec7f855aae7bcfb08f570088c6cb993f68c361a0727abab35dbf021acb/opensearch_py-3.0.0.tar.gz", hash = "sha256:ebb38f303f8a3f794db816196315bcddad880be0dc75094e3334bc271db2ed39", size = 248890, upload-time = "2025-06-17T05:39:48.453Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/71/e0/69fd114c607b0323d3f864ab4a5ecb87d76ec5a172d2e36a739c8baebea1/opensearch_py-3.0.0-py3-none-any.whl", hash = "sha256:842bf5d56a4a0d8290eda9bb921c50f3080e5dc4e5fefb9c9648289da3f6a8bb", size = 371491, upload-time = "2025-06-17T05:39:46.539Z" },
 ]
 
 [[package]]
