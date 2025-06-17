@@ -40,10 +40,3 @@ def get_recommendations(user_id: str):
             status_code=500,
             detail="Internal server error while fetching recommendations"
         )
-
-@app.get("/health")
-async def health_check():
-    """
-    API 헬스 체크
-    """
-    return {"status": "ok"}
