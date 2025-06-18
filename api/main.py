@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from recommendation.api.routers import recommendation
+from api.routers import recommendation
 import logging
 
 # 로깅 설정

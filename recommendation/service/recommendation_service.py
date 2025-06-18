@@ -1,5 +1,5 @@
-from recommendation.storage.s3_manager import S3Manager
-from recommendation.storage.opensearch_manager import OpenSearchManager
+from utils.storage.s3_manager import S3Manager
+from utils.storage.opensearch_manager import OpenSearchManager
 from recommendation.transformer.recommendation_transformer import RecommendationTransformer
 from config.recommendation_config import OPENSEARCH_CONFIG
 

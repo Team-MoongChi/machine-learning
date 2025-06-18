@@ -1,5 +1,5 @@
 from recommendation.transformer.recommendation_transformer import RecommendationTransformer
-from recommendation.storage.opensearch_manager import OpenSearchManager
+from utils.storage.opensearch_manager import OpenSearchManager
 
 def test_recommendation_flow():
     # S3에서 가져온 추천 데이터 
