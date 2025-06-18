@@ -47,3 +47,49 @@ class DataProcessor:
         recent_favorites = group_favorites[group_favorites['created_at'] >= cutoff_date]
         
         return recent_favorites
+
+    def join_all_data(self, recent_favorites: pd.DataFrame, 
+                     users: pd.DataFrame, group_boards: pd.DataFrame) -> pd.DataFrame:
+        """찜하기, 사용자, 공구방 데이터를 조인"""
+        
+        # 사용자 정보 조인
+        user_cols = ['id', 'name', 'address']
+        joined_data = recent_favorites.merge(
+            users[user_cols],
+            left_on='user_id',
+            right_on='id',
+            how='left',
+            suffixes=('', '_user')
+        )
+        
+        # 공구방 정보 조인
+        group_cols = ['id', 'title', 'location', 'status', 'total_users']
+        final_data = joined_data.merge(
+            group_boards[group_cols],
+            left_on='group_board_id',
+            right_on='id',
+            how='left',
+            suffixes=('', '_group')
+        )
+        
+        # 컬럼 정리
+        final_data = self._clean_columns(final_data)
+        
+        return final_data
+
+    def _clean_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        """중복 컬럼 제거 및 정리"""
+        columns_to_drop = []
+        for col in ['id_user', 'id_group', 'id_y']:
+            if col in df.columns:
+                columns_to_drop.append(col)
+        
+        if columns_to_drop:
+            df = df.drop(columns=columns_to_drop)
+        
+        if 'id_x' in df.columns:
+            df = df.rename(columns={'id_x': 'favorite_id'})
+        elif 'id' in df.columns and 'favorite_id' not in df.columns:
+            df = df.rename(columns={'id': 'favorite_id'})
+            
+        return df
