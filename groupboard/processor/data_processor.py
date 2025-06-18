@@ -1,8 +1,6 @@
 import pandas as pd
-import numpy as np
 from datetime import datetime, timedelta
-import re
-from typing import Optional, Tuple
+from typing import Tuple
 from config.group_board_config import ANALYSIS_DAYS
 
 class DataProcessor:
