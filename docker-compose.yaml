@@ -1,26 +1,21 @@
 services:
-  mariadb:
-    container_name: machine-learning-mariadb
-    image: registryhj/mariadb:10.11
-    environment:
-      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
-      - MARIADB_USER=${MARIADB_USER}
-      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
-      - MARIADB_DATABASE=${MARIADB_DATABASE}
+  ml-api:
+    build: .
+    container_name: ml-api
     ports:
-      - '3306:3306'
+      - "8000:8000"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - OPENSEARCH_HOST=${OPENSEARCH_HOST}
+      - OPENSEARCH_PORT=${OPENSEARCH_PORT}
+      - OPENSEARCH_USERNAME=${OPENSEARCH_USERNAME}
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}
     volumes:
-      - machine-learning-mariadb:/var/lib/mysql
-    networks:
-      - machine-learning-network
-    restart: unless-stopped
-    stdin_open: true
-    tty: true
-
-volumes:
-  machine-learning-mariadb:
-    driver: local
-
-networks:
-  machine-learning-network:
-    driver: bridge
+      - .env:/app/.env
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
