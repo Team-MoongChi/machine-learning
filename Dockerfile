@@ -16,11 +16,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt  
 
 # 애플리케이션 파일 복사
-COPY api/ api/ 
-COPY config/ config/    
-COPY recommendation/ recommendation/ 
-COPY groupboard/ groupboard/
-COPY utils/ utils/
+COPY . .
 
 # python 모듈 경로 설정, API 서버 포트 설정 
 ENV PYTHONPATH=/app         
