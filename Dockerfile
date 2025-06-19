@@ -16,8 +16,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt  
 
 # 애플리케이션 파일 복사
+COPY api/ api/ 
+COPY config/ config/    
 COPY recommendation/ recommendation/ 
-COPY config/ config/                 
+COPY groupboard/ groupboard/
+COPY utils/ utils/
 
 # python 모듈 경로 설정, API 서버 포트 설정 
 ENV PYTHONPATH=/app         
@@ -27,4 +30,4 @@ ENV PORT=8000
 EXPOSE 8000                 
 
 # 실행 명령어
-CMD ["uvicorn", "recommendation.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
