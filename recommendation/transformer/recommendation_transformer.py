@@ -1,8 +1,9 @@
 class RecommendationTransformer:
     @staticmethod
-    def to_core_data(recommendation_data: dict) -> dict:
+    def to_core_data(doc_id: str, recommendation_data: dict) -> dict:
         """S3 데이터를 OpenSearch 형식으로 변환"""
         return {
+            "doc_id": doc_id,
             "user_id": str(recommendation_data["user_id"]),
             "recommended_item_ids": [str(item["item_id"]) for item in recommendation_data.get("recommendations", [])],
             "experiment_id": str(recommendation_data["experiment_id"]),
