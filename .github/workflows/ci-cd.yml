@@ -58,8 +58,11 @@ jobs:
           docker pull $DOCKERHUB_USERNAME/ml-api:latest
           
           echo "🛑 Stopping and removing existing containers..."
-          docker stop ml-api || true
-          docker rm ml-api || true
+          if docker ps -q -f name=ml-api >/dev/null; then
+            echo "Gracefully stopping existing container..."
+            docker stop -t 30 ml-api  # 30초 타임아웃으로 안전하게 종료
+            docker rm ml-api
+          fi
           
           echo "🧹 Cleaning up Docker system..."
           docker system prune -f
