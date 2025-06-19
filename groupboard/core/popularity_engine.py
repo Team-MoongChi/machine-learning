@@ -44,3 +44,31 @@ class PopularityEngine:
             how='left'
         )
     
+    def fill_missing_activity(self, result: pd.DataFrame) -> pd.DataFrame:
+        """활동 없는 공구방의 기본값 보정 - 모든 공구방에 대해 인기도 점수 계산 필요"""
+        result['recent_favorites'] = result['recent_favorites'].fillna(0).astype(int)
+        result['latest_favorite'] = result['latest_favorite'].fillna(pd.Timestamp.now() - pd.Timedelta(days=999))
+        return result
+
+    def calculate_weights(self, result: pd.DataFrame) -> pd.DataFrame:
+        """
+        상태, 시간 가중치 계산 및 days_since_latest 컬럼 추가
+        
+        - status_weight: 공구방 상태별로 미리 정한 가중치
+        - days_since_latest: 최근 찜 이후 며칠이 지났는지
+        - time_weight: 최근일수록 높게, 오래됐을수록 낮게 주는 시간 가중치
+        """
+        result['status_weight'] = result['status'].map(lambda x: STATUS_WEIGHTS.get(x, 0.5))
+        now = pd.Timestamp.now()
+        result['days_since_latest'] = (now - result['latest_favorite']).dt.days
+        result['time_weight'] = result['days_since_latest'].apply(get_time_weight)
+        return result
+
+    def calculate_popularity_score(self, result: pd.DataFrame) -> pd.DataFrame:
+        """최종 인기도 점수 계산"""
+        result['popularity_score'] = (
+            result['recent_favorites'] *
+            result['status_weight'] *
+            result['time_weight']
+        )
+        return result
