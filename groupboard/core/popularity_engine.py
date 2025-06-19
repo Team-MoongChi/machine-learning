@@ -36,16 +36,21 @@ class PopularityEngine:
     def merge_group_activity(
         self, regional_groups: pd.DataFrame, activity_stats: pd.DataFrame
     ) -> pd.DataFrame:
+        
         """공구방 정보와 활동 통계 병합"""
-        return regional_groups.merge(
+        # group_board_id가 NaN인 것 = 해당 공구방에 최근 활동이 없는 것 
+        result = regional_groups.merge(
             activity_stats,
             left_on='id',
             right_on='group_board_id',
             how='left'
         )
+
+        return result
     
     def fill_missing_activity(self, result: pd.DataFrame) -> pd.DataFrame:
         """활동 없는 공구방의 기본값 보정 - 모든 공구방에 대해 인기도 점수 계산 필요"""
+        result['group_board_id'] = result['group_board_id'].fillna(result['id']).astype(int)
         result['recent_favorites'] = result['recent_favorites'].fillna(0).astype(int)
         result['latest_favorite'] = result['latest_favorite'].fillna(pd.Timestamp.now() - pd.Timedelta(days=999))
         return result
