@@ -1,6 +1,7 @@
 from opensearchpy import OpenSearch
 from config.recommendation_config import OPENSEARCH_CONFIG
 import logging
+import json
 
 class OpenSearchManager:
     def __init__(self, index: str):
@@ -16,11 +17,56 @@ class OpenSearchManager:
             )
         self.index = index
     
+    def create_index(self) -> bool:
+        """인덱스가 없을 경우에만 생성"""
+        try:
+            print(f"Creating index {self.index} if it does not exist...")
+            # 인덱스 존재 여부 확인
+            if self.client.indices.exists(index=self.index):
+                logging.info(f"Index {self.index} already exists")
+                return True
+                
+            mapping = {
+                "mappings": {
+                    "properties": {
+                        "doc_id":        { "type": "keyword" },
+                        "user_id":       { "type": "keyword" },
+                        "user_district": { "type": "keyword" },
+                        "analysis_period": { "type": "keyword" },
+                        "total_local_groups": { "type": "integer" },
+                        "returned_groups": { "type": "integer" },
+                        "latest_favorite": { "type": "date" },
+                        "popular_groups": {
+                            "type": "nested",
+                            "properties": {
+                                "group_id":         { "type": "keyword" },
+                                "title":            { "type": "text" },
+                                "location":         { "type": "text" },
+                                "recent_favorites": { "type": "integer" },
+                                "latest_favorite":  { "type": "date" }
+                            }
+                        }
+                    }
+                }
+            }
+
+            response = self.client.indices.create(index=self.index, body=mapping)
+            logging.info(f"Created new index {self.index}")
+            return True
+            
+        except Exception as e:
+            logging.error(f"Failed to create index {self.index}: {str(e)}")
+            return False
+    
+    # 인덱스 타입 자동 추론돼서 에러 발생 
     def upload(self, doc_id: str, data: dict) -> None:
+        self.create_index()  # 인덱스가 없으면 생성
+        data = json.dumps(data, ensure_ascii=False, indent=2)
         response = self.client.index(
             index=self.index,
             id=doc_id,
-            body=data
+            body=data,
+            headers={"Content-Type": "application/json"}
         )
         logging.info(f"Uploaded recommendation data to OpenSearch index {self.index} with ID {doc_id}: {response}")
 
@@ -54,3 +100,26 @@ class OpenSearchManager:
         except Exception as e:
             logging.error(f"OpenSearch search error: {e}")
             return {}
+    
+    def delete_all(self) -> int:
+        """인덱스의 모든 문서 삭제"""
+        query = {
+            "query": {
+                "match_all": {}
+            }
+        }
+        
+        response = self.client.delete_by_query(
+            index=self.index,
+            body=query
+        )
+        
+        return response['deleted']
+
+    def delete_index(self) -> bool:
+        """인덱스 전체 삭제"""
+        try:
+            response = self.client.indices.delete(index=self.index)
+            return True
+        except Exception as e:
+            return False
