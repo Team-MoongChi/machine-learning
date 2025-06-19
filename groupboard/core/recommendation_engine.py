@@ -42,3 +42,18 @@ class RecommendationEngine:
             'total_local_groups': len(popularity_result),
             'groups': top_groups.to_dict('records')
         }
+    
+    def get_all_user_recommendations(self, top_n: int = TOP_N_GROUPS) -> List[Dict]:
+        """모든 사용자의 추천 결과 생성"""
+        
+        users_df = self.data_loader.get_users()
+        all_user_ids = users_df['id'].tolist()
+        
+        recommendations = []
+        
+        for user_id in all_user_ids:
+            result = self.get_user_recommendations(user_id, top_n)
+            if result:
+                recommendations.append(result)
+        
+        return recommendations
