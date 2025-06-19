@@ -1,8 +1,8 @@
-from recommendation.service.recommendation_service import RecommendationService
+from recommendation.service.recommendation_repository import RecommendationRepository
 
 def test_recommendation_service():
     # 서비스 인스턴스 생성
-    service = RecommendationService(
+    service = RecommendationRepository(
         s3_bucket="team6-mlops-bucket",
         opensearch_index="test_recommendations"
     )
