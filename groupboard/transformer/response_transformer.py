@@ -5,9 +5,10 @@ class ResponseTransformer:
     """응답 데이터 변환 및 정제 담당 클래스"""
     
     @staticmethod
-    def to_opensearch_doc(result: Dict, days: int = 14) -> Dict:
+    def to_opensearch_doc(doc_id: str, result: Dict, days: int = 14) -> Dict:
         """OpenSearch 저장용으로 필드 정제 및 형 변환"""
         return {
+            "doc_id": doc_id,
             "user_id": str(result['user_id']),
             "user_district": str(result['user_district']),
             "analysis_period": f"최근 {days}일",
@@ -18,9 +19,8 @@ class ResponseTransformer:
                     "group_id": str(group['group_board_id']),
                     "title": str(group['title']),
                     "location": str(group['location']),
-                    "participants": int(group['participants']) if pd.notna(group['participants']) else 0,
                     "recent_favorites": int(group['recent_favorites']),
-                    "latest_favorite": str(group['latest_favorite']),  # ISO8601 string
+                    "latest_favorite": str(group['latest_favorite'].isoformat()),  # ISO8601 string
                 }
                 for group in result['groups']
             ]
@@ -41,7 +41,6 @@ class ResponseTransformer:
                     "title": str(group['title']),
                     "location": str(group['location']),
                     "status": str(group['status']),
-                    "participants": int(group['participants']) if pd.notna(group['participants']) else 0,
                     "recent_favorites": int(group['recent_favorites']),
                     "popularity_score": round(float(group['popularity_score']), 2),
                     "latest_favorite": str(group['latest_favorite']),
