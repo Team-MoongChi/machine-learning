@@ -8,8 +8,11 @@ class DataProcessor:
     
     def __init__(self, data_path: str):
         self.data_path = data_path
+        self.users = None
+        self.group_boards = None
+        self.recent_activities = None
         
-    def load_data(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def load_data(self) -> bool:
         """데이터 파일들을 로드하여 반환"""
         try:
             favorites_path = f"{self.data_path}/favorite_products_dummy_3000.csv"
@@ -17,10 +20,11 @@ class DataProcessor:
             groups_path = f"{self.data_path}/group_boards_dummy_366.csv"
             
             favorite_products = pd.read_csv(favorites_path)
-            users = pd.read_csv(users_path)
-            group_boards = pd.read_csv(groups_path)
+            self.users = pd.read_csv(users_path)
+            self.group_boards = pd.read_csv(groups_path)
+            self.recent_activities = self.filter_recent_group_favorites(favorite_products)
             
-            return favorite_products, users, group_boards
+            return True
             
         except Exception as e:
             raise Exception(f"데이터 로드 실패: {e}")
