@@ -31,3 +31,26 @@ class OpenSearchManager:
         except Exception as e:
             logging.error(f"Error retrieving from OpenSearch: {e}")
             return None
+    
+    def search(self, body: dict, size: int = 10) -> dict:
+        """
+        OpenSearch에서 쿼리로 여러 문서를 검색
+
+        Args:
+            body (dict): OpenSearch 쿼리 DSL (예: {"query": {...}})
+            size (int): 반환할 최대 문서 수
+
+        Returns:
+            dict: 검색 결과 전체(JSON)
+        """
+        try:
+            response = self.client.search(
+                index=self.index,
+                body=body,
+                size=size
+            )
+            logging.info(f"OpenSearch search executed on index {self.index} with body {body}")
+            return response
+        except Exception as e:
+            logging.error(f"OpenSearch search error: {e}")
+            return {}
