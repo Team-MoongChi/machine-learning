@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from api.routers import recommendation
+from api.routers import group_board
 import logging
 
 # 로깅 설정
@@ -15,9 +16,16 @@ app = FastAPI(
 
 # 라우터 등록
 app.include_router(
-    recommendation.router,
+    recommendation,
     prefix="/api/v1",
     tags=["recommendations"]
+)
+
+# groupboard 라우터 추가
+app.include_router(
+    group_board,
+    prefix="/api/v1",
+    tags=["group_boards"]
 )
 
 @app.get("/health")
