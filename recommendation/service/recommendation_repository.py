@@ -52,7 +52,7 @@ class RecommendationRepository:
                 logger.warning(f"No recommendation found in OpenSearch: {doc_id}")
                 return None
             
-            print(f"Retrieved recommendation from OpenSearch: {doc_id}")
+            logger.info(f"Retrieved recommendation from OpenSearch: {core_data}")
             # 백엔드 포맷으로 변환
             return self.transformer.to_backend_format(core_data)
             
