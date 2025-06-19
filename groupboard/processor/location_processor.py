@@ -25,3 +25,21 @@ class LocationProcessor:
             LocationProcessor.extract_district
         )
         return data_copy
+
+    @staticmethod
+    def get_user_district(user_id: int, users_df: pd.DataFrame) -> Optional[str]:
+        """사용자 ID로 구 정보 조회"""
+        user_info = users_df[users_df['id'] == user_id]
+        if len(user_info) == 0:
+            return None
+
+        user_address = user_info['address'].iloc[0]
+        return LocationProcessor.extract_district(user_address)
+
+    @staticmethod
+    def get_groups_in_district(district: str, group_board_df: pd.DataFrame) -> pd.DataFrame:
+        """특정 구의 공구방들 조회"""
+        group_board_df = group_board_df.copy()
+        group_board_df['district'] = group_board_df['location'].apply(
+            LocationProcessor.extract_district)
+        return group_board_df[group_board_df['district'] == district]
