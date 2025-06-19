@@ -72,3 +72,49 @@ class PopularityEngine:
             result['time_weight']
         )
         return result
+    
+    def calculate_regional_popularity(
+        self, district: str, group_boards_df: pd.DataFrame, recent_activities_df: pd.DataFrame
+    ) -> pd.DataFrame:
+        """
+        특정 지역(구)의 공구방 인기도 계산 전체 플로우
+        1. 해당 구의 공구방 추출
+        2. 해당 구 공구방의 최근 활동 필터링
+        3. 활동 통계 계산
+        4. 공구방 정보와 통계 병합
+        5. 결측값 보정
+        6. 가중치 계산
+        7. 인기도 점수 계산 및 정렬
+        """
+        # 1. 해당 구의 공구방 추출
+        regional_groups = self.extract_regional_groups(district, group_boards_df)
+        if len(regional_groups) == 0:
+            return pd.DataFrame()
+
+        # 2. 해당 구 공구방의 최근 활동 필터링
+        regional_activities = self.filter_regional_activities(regional_groups, recent_activities_df)
+
+        # 3. 활동이 없는 경우 기본값 반환
+        if len(regional_activities) == 0:
+            result = regional_groups.copy()
+            result['recent_favorites'] = 0
+            result['popularity_score'] = 0.0
+            result['latest_favorite'] = None
+            result['days_since_latest'] = 999
+            result['time_weight'] = 0.1
+            result['status_weight'] = result['status'].map(lambda x: STATUS_WEIGHTS.get(x, 0.5))
+            return result.sort_values('id')
+
+        # 4. 활동 통계 계산
+        activity_stats = self.calculate_activity_stats(regional_activities)
+        # 5. 공구방 정보와 통계 병합
+        result = self.merge_group_activity(regional_groups, activity_stats)
+        # 6. 결측값 보정
+        result = self.fill_missing_activity(result)
+        # 7. 가중치 계산
+        result = self.calculate_weights(result)
+        # 8. 인기도 점수 계산
+        result = self.calculate_popularity_score(result)
+
+        # 9. 인기도 순 정렬
+        return result.sort_values(['popularity_score', 'latest_favorite'], ascending=[False, False])
