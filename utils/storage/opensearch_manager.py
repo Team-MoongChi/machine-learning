@@ -1,5 +1,6 @@
 from opensearchpy import OpenSearch
 from config.recommendation_config import OPENSEARCH_CONFIG
+from config.opensearch_mappings import GROUP_RECOMMENDATION_MAPPING
 import logging
 import json
 
@@ -16,6 +17,7 @@ class OpenSearchManager:
             retry_on_timeout=True
             )
         self.index = index
+        self.mapping = GROUP_RECOMMENDATION_MAPPING
     
     def create_index(self) -> bool:
         """인덱스가 없을 경우에만 생성"""
@@ -26,31 +28,7 @@ class OpenSearchManager:
                 logging.info(f"Index {self.index} already exists")
                 return True
                 
-            mapping = {
-                "mappings": {
-                    "properties": {
-                        "doc_id":        { "type": "keyword" },
-                        "user_id":       { "type": "keyword" },
-                        "user_district": { "type": "keyword" },
-                        "analysis_period": { "type": "keyword" },
-                        "total_local_groups": { "type": "integer" },
-                        "returned_groups": { "type": "integer" },
-                        "latest_favorite": { "type": "date" },
-                        "popular_groups": {
-                            "type": "nested",
-                            "properties": {
-                                "group_id":         { "type": "keyword" },
-                                "title":            { "type": "text" },
-                                "location":         { "type": "text" },
-                                "recent_favorites": { "type": "integer" },
-                                "latest_favorite":  { "type": "date" }
-                            }
-                        }
-                    }
-                }
-            }
-
-            response = self.client.indices.create(index=self.index, body=mapping)
+            response = self.client.indices.create(index=self.index, body=self.mapping)
             logging.info(f"Created new index {self.index}")
             return True
             

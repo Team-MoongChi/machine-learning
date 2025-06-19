@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from recommendation.service.recommendation_service import RecommendationService
+from recommendation.service.recommendation_repository import RecommendationRepository
 import logging
 
 # 로깅 설정
@@ -9,9 +9,9 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # RecommendationService 인스턴스 생성
-service = RecommendationService(
+service = RecommendationRepository(
         s3_bucket="team6-mlops-bucket",
-        opensearch_index="test_recommendations"
+        opensearch_index="recommendations"
     )
 
 @router.get("/recommendations/{user_id}")
@@ -21,7 +21,7 @@ def get_recommendations(user_id: str):
     """
     try:
         doc_id = f"user_{user_id}"
-        recommendations = service.get_recommendation(doc_id)
+        recommendations = service.get_from_opensearch(doc_id)
         
         if not recommendations:
             raise HTTPException(
