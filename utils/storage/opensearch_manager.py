@@ -1,5 +1,5 @@
 from opensearchpy import OpenSearch
-from config.recommendation_config import OPENSEARCH_CONFIG
+from config.opensearch_config import OPENSEARCH_CONFIG
 from config.opensearch_mappings import GROUP_RECOMMENDATION_MAPPING
 import logging
 import json
