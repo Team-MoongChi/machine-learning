@@ -70,9 +70,11 @@ class DataProcessor:
         except Exception as e:
             print(f"JSON 파일 읽기 실패: {e}")
             return []
-        
     
-    def clean_search_logs(self, logs) -> pd.DataFrame:
+    def split_by_event(self, logs: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
+        pass
+    
+    def clean_search_logs(self, logs: List[Dict]) -> pd.DataFrame:
         """검색 로그 데이터 정제 및 데이터프레임 변환"""
         rows = []
         for log in logs:
@@ -91,7 +93,7 @@ class DataProcessor:
                 continue
         return pd.DataFrame(rows)
 
-    def clean_click_logs(self, logs):
+    def clean_click_logs(self, logs: List[Dict]) -> pd.DataFrame:
         """클릭 로그 데이터 정제 및 데이터프레임 변환"""
         rows = []
         for log in logs:
