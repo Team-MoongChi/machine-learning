@@ -33,6 +33,32 @@ class DataProcessor:
         except Exception as e:
             raise Exception(f"데이터 로드 실패: {e}")
     
+    def read_jsonl(self, S3_logs) :
+        """
+        {\"key\":\"value\"} 형태의 이중 이스케이프 JSONL 파일을 리스트로 반환
+        S3 로그 파일을 불러올 때 사용    
+        """
+        logs = []
+        try:
+            with open(S3_logs, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        # 1차 파싱(문자열)
+                        tmp = json.loads(line)
+                        # 2차 파싱(딕셔너리)
+                        obj = json.loads(tmp)
+                        logs.append(obj)
+                    except Exception as e:
+                        print(f"파싱 실패: {e}")
+            return logs
+        except Exception as e:
+            print(f"JSONL 파일 읽기 실패: {e}")
+            return []
+
+    
     def clean_search_logs(self) -> pd.DataFrame:
         """검색 로그 데이터 정제 및 데이터프레임 변환"""
         rows = []
