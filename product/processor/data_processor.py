@@ -1,13 +1,14 @@
 import os
 import json
 import pandas as pd
-from typing import Tuple, List, Optional
+from typing import Tuple, List, Optional, Dict
 from utils.storage.mysql_manager import MySQLManager
 
 class DataProcessor:
     """데이터 로드 및 전처리 담당 클래스"""
     def __init__(self):
         self.mysql = MySQLManager()
+        self.data_path = os.path.join(self.data_path, "data/user_activity_logs_final_.json")
         self.products = None
         self.categories = None
         self.users = None
@@ -33,7 +34,7 @@ class DataProcessor:
         except Exception as e:
             raise Exception(f"데이터 로드 실패: {e}")
     
-    def read_jsonl(self, S3_logs) :
+    def read_jsonl(self, S3_logs) -> List[Dict]:
         """
         {\"key\":\"value\"} 형태의 이중 이스케이프 JSONL 파일을 리스트로 반환
         S3 로그 파일을 불러올 때 사용    
@@ -57,7 +58,19 @@ class DataProcessor:
         except Exception as e:
             print(f"JSONL 파일 읽기 실패: {e}")
             return []
-
+    
+    def read_json(self) -> List[Dict]:
+        """
+        Json 배열 파일을 리스트로 반환 
+        학습용 로그 데이터를 불러올 때 사용
+        """
+        try:
+            with open(self.file_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"JSON 파일 읽기 실패: {e}")
+            return []
+        
     
     def clean_search_logs(self) -> pd.DataFrame:
         """검색 로그 데이터 정제 및 데이터프레임 변환"""
