@@ -3,7 +3,6 @@ from groupboard.service.group_recommendation_service import GroupRecommendationS
 def test_initialize():
     # 서비스 인스턴스 생성
     service = GroupRecommendationService(
-        data_path="data",
         s3_bucket="team6-mlops-bucket",
         opensearch_index="group-recommendations"
     )
@@ -17,7 +16,6 @@ def test_initialize():
 def test_upload_recommendations():
     # 서비스 인스턴스 생성
     service = GroupRecommendationService(
-        data_path="data",
         s3_bucket="team6-mlops-bucket",
         opensearch_index="group-recommendations"
     )
@@ -33,7 +31,6 @@ def test_upload_recommendations():
 def test_get_recommendation():
     # 서비스 인스턴스 생성
     service = GroupRecommendationService(
-        data_path="data",
         s3_bucket="team6-mlops-bucket",
         opensearch_index="group-recommendations"
     )
@@ -48,7 +45,6 @@ def test_get_recommendation():
 def test_delete_storage_data(s3_prefix: str) -> None:
     """S3와 OpenSearch의 기존 데이터 삭제"""
     service = GroupRecommendationService(
-        data_path="data",
         s3_bucket="team6-mlops-bucket",
         opensearch_index="group-recommendations"
     )
@@ -65,7 +61,6 @@ def test_delete_storage_data(s3_prefix: str) -> None:
 def delete_index():
     """OpenSearch 인덱스 삭제"""
     service = GroupRecommendationService(
-        data_path="data",
         s3_bucket="team6-mlops-bucket",
         opensearch_index="group-recommendations"
     )

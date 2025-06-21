@@ -18,7 +18,7 @@ class RecommendationEngine:
         # 1. 사용자 지역 확인
         users_df = self.data_loader.users
         user_district = LocationProcessor.get_user_district(user_id, users_df)
-        
+        print(f"User {user_id} - District: {user_district}")
         if not user_district:
             return None
         
@@ -29,6 +29,8 @@ class RecommendationEngine:
         popularity_result = self.popularity_engine.calculate_regional_popularity(
             user_district, group_boards_df, recent_activities_df
         )
+        
+        print(f"User {user_id} - District: {user_district}, Total Groups: {len(popularity_result)}")
         
         if len(popularity_result) == 0:
             return None
@@ -47,7 +49,7 @@ class RecommendationEngine:
         """모든 사용자의 추천 결과 생성"""
         
         users_df = self.data_loader.users
-        all_user_ids = users_df['id'].tolist()
+        all_user_ids = users_df['user_id'].tolist()
         print(len(all_user_ids))
         
         recommendations = []

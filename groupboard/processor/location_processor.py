@@ -29,7 +29,7 @@ class LocationProcessor:
     @staticmethod
     def get_user_district(user_id: int, users_df: pd.DataFrame) -> Optional[str]:
         """사용자 ID로 구 정보 조회"""
-        user_info = users_df[users_df['id'] == user_id]
+        user_info = users_df[users_df['user_id'] == user_id]
         if len(user_info) == 0:
             return None
 

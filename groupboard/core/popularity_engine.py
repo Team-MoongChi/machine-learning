@@ -17,7 +17,7 @@ class PopularityEngine:
             self, regional_groups: pd.DataFrame, recent_activities_df: pd.DataFrame
     ) -> pd.DataFrame:
         """해당 지역 공구방들의 최근 활동만 필터링"""
-        regional_group_ids = regional_groups['id'].tolist()
+        regional_group_ids = regional_groups['group_board_id'].tolist()
         return recent_activities_df[recent_activities_df['group_board_id'].isin(regional_group_ids)]
 
     def calculate_activity_stats(
@@ -37,12 +37,14 @@ class PopularityEngine:
         self, regional_groups: pd.DataFrame, activity_stats: pd.DataFrame
     ) -> pd.DataFrame:
         
+        print(regional_groups.head())
+        print(activity_stats.head())
+
         """공구방 정보와 활동 통계 병합"""
         # group_board_id가 NaN인 것 = 해당 공구방에 최근 활동이 없는 것 
         result = regional_groups.merge(
             activity_stats,
-            left_on='id',
-            right_on='group_board_id',
+            on='group_board_id',
             how='left'
         )
 
@@ -93,11 +95,13 @@ class PopularityEngine:
         """
         # 1. 해당 구의 공구방 추출
         regional_groups = self.extract_regional_groups(district, group_boards_df)
+        print(f"지역: {district}, 공구방 수: {len(regional_groups)}")
         if len(regional_groups) == 0:
             return pd.DataFrame()
 
         # 2. 해당 구 공구방의 최근 활동 필터링
         regional_activities = self.filter_regional_activities(regional_groups, recent_activities_df)
+        print(f"지역: {district}, 최근 활동 공구방 수: {len(regional_activities)}")
 
         # 3. 활동이 없는 경우 기본값 반환
         if len(regional_activities) == 0:
@@ -108,7 +112,7 @@ class PopularityEngine:
             result['days_since_latest'] = 999
             result['time_weight'] = 0.1
             result['status_weight'] = result['status'].map(lambda x: STATUS_WEIGHTS.get(x, 0.5))
-            return result.sort_values('id')
+            return result.sort_values('group_board_id')
 
         # 4. 활동 통계 계산
         activity_stats = self.calculate_activity_stats(regional_activities)
