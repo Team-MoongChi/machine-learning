@@ -51,3 +51,22 @@ class DataProcessor:
             except Exception:
                 continue
         return pd.DataFrame(rows)
+
+    def clean_click_logs(self, logs):
+        """클릭 로그 데이터 정제 및 데이터프레임 변환"""
+        rows = []
+        for log in logs:
+            try:
+                user_id = int(log['user_id'])
+                product_id = int(log['item_id'])
+                rows.append({
+                    'user_id': user_id,
+                    'product_id': product_id,
+                    'item_name': str(log.get('item_name', '')),
+                    'clicked_at': log.get('clicked_at', ''),
+                    'item_category': str(log.get('item_category', '')),
+                    'item_price': int(log.get('item_price', 0))
+                })
+            except Exception:
+                continue
+        return pd.DataFrame(rows)
