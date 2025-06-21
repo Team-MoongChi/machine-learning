@@ -12,8 +12,8 @@ import json
 class GroupRecommendationService:
     """공구방 추천 서비스 메인 클래스"""
     
-    def __init__(self, data_path: str, s3_bucket: str, opensearch_index: str):
-        self.data_processor = DataProcessor(data_path)
+    def __init__(self, s3_bucket: str, opensearch_index: str):
+        self.data_processor = DataProcessor()
         self.recommendation_engine = None
         self.response_formatter = ResponseTransformer()
         
