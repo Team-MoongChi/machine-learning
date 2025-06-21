@@ -72,7 +72,35 @@ class DataProcessor:
             return []
     
     def split_by_event(self, logs: List[Dict]) -> Tuple[List[Dict], List[Dict]]:
-        pass
+        """검색/클릭 이벤트로 분리"""
+        search, click = [], []  
+
+        for log in logs:  # logs 리스트를 한 개씩 꺼내서
+            msg = log.get('message', {})  # log에서 message라는 값을 꺼냄. 없으면 빈 dict
+
+            # 만약 message가 문자열이면, json.loads로 딕셔너리로 바꿔줌
+            if isinstance(msg, str):
+                try:
+                    msg = json.loads(msg)
+                except Exception:
+                    continue  # 변환 실패하면 무시하고 다음으로
+
+            # message가 딕셔너리가 아니면 무시
+            if not isinstance(msg, dict):
+                continue
+
+            # 이벤트 타입 가져오기
+            ev = msg.get('event_type')
+
+            # 검색이면 search 리스트에 추가
+            if ev == 'search':
+                search.append(msg)
+            # 클릭이면 click 리스트에 추가
+            elif ev == 'click':
+                click.append(msg)
+
+        return search, click  
+
     
     def clean_search_logs(self, logs: List[Dict]) -> pd.DataFrame:
         """검색 로그 데이터 정제 및 데이터프레임 변환"""
