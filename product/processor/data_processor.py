@@ -16,7 +16,7 @@ class DataProcessor:
         self.search_logs = None
         self.click_logs = None
         
-    def load_data(self) -> bool:
+    def load_db_data(self) -> bool:
         """백엔드 MySQL에서 데이터 추출해서 반환"""
         try:
             self.products= self.mysql.read_table('products')
