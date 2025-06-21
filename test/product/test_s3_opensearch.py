@@ -1,4 +1,4 @@
-from recommendation.transformer.recommendation_transformer import RecommendationTransformer
+from product.transformer.recommendation_transformer import RecommendationTransformer
 from utils.storage.opensearch_manager import OpenSearchManager
 
 def test_recommendation_flow():
