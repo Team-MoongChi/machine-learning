@@ -72,10 +72,10 @@ class DataProcessor:
             return []
         
     
-    def clean_search_logs(self) -> pd.DataFrame:
+    def clean_search_logs(self, logs) -> pd.DataFrame:
         """검색 로그 데이터 정제 및 데이터프레임 변환"""
         rows = []
-        for log in self.click_logs:
+        for log in logs:
             try:
                 user_id = int(log['user_id'])
                 keyword = str(log['search_keyword']).strip()
