@@ -1,10 +1,10 @@
 import pymysql
 import pandas as pd
-import config.mysql_config as MYSQL_CONFIG
+from config.mysql_config import MYSQL_CONFIG
 
 class MySQLManager:
     # init에 연결 정보
-    def __init__(self, MYSQL_CONFIG=MYSQL_CONFIG):
+    def __init__(self):
         self.config = MYSQL_CONFIG
     
     def get_connection(self):
