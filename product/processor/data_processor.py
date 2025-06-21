@@ -6,9 +6,9 @@ from utils.storage.mysql_manager import MySQLManager
 
 class DataProcessor:
     """데이터 로드 및 전처리 담당 클래스"""
-    def __init__(self):
+    def __init__(self, file_path: str = "data/user_activity_logs_final_.json"):
         self.mysql = MySQLManager()
-        self.data_path = os.path.join(self.data_path, "data/user_activity_logs_final_.json")
+        self.file_path = file_path
         self.products = None
         self.categories = None
         self.users = None
