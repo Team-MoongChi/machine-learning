@@ -34,6 +34,31 @@ class DataProcessor:
         except Exception as e:
             raise Exception(f"데이터 로드 실패: {e}")
     
+    def load_log_data(self) -> bool:
+        """
+        JSON 배열 로그 파일을 
+        - 검색 로그 DataFrame
+        - 클릭 로그 DataFrame
+        으로 저장 
+        """
+        # 파일 포맷 판별
+        try:
+            with open(self.file_path, 'r', encoding='utf-8') as f:
+                logs = json.load(f)
+        except Exception as e:
+            print(f"[ERROR] 로그 파일 읽기 실패: {e}")
+            return pd.DataFrame(), pd.DataFrame()
+
+        # 이벤트별 분리
+        search_logs, click_logs = self.split_by_event(logs)
+
+        # 정제 및 DataFrame 변환
+        self.search_logs = self.clean_search_logs(search_logs)
+        self.click_logs = self.clean_click_logs(click_logs)
+        print(f"[INFO] 검색 로그 {len(search_df)}개, 클릭 로그 {len(click_df)}개 로드 완료")
+
+        return True
+    
     def read_jsonl(self, S3_logs) -> List[Dict]:
         """
         {\"key\":\"value\"} 형태의 이중 이스케이프 JSONL 파일을 리스트로 반환
