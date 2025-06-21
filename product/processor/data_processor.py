@@ -12,6 +12,8 @@ class DataProcessor:
         self.categories = None
         self.users = None
         self.favorite_products = None
+        self.search_logs = None
+        self.click_logs = None
         
     def load_data(self) -> bool:
         """백엔드 MySQL에서 데이터 추출해서 반환"""
@@ -30,3 +32,22 @@ class DataProcessor:
             
         except Exception as e:
             raise Exception(f"데이터 로드 실패: {e}")
+    
+    def clean_search_logs(self) -> pd.DataFrame:
+        """검색 로그 데이터 정제 및 데이터프레임 변환"""
+        rows = []
+        for log in self.click_logs:
+            try:
+                user_id = int(log['user_id'])
+                keyword = str(log['search_keyword']).strip()
+                if not keyword:
+                    continue
+                rows.append({
+                    'user_id': user_id,
+                    'keyword': keyword,
+                    'searched_at': log.get('searched_at', ''),
+                    'search_result_count': int(log.get('search_result_count', 0))
+                })
+            except Exception:
+                continue
+        return pd.DataFrame(rows)
