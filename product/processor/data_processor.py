@@ -55,7 +55,7 @@ class DataProcessor:
         # 정제 및 DataFrame 변환
         self.search_logs = self.clean_search_logs(search_logs)
         self.click_logs = self.clean_click_logs(click_logs)
-        print(f"[INFO] 검색 로그 {len(search_df)}개, 클릭 로그 {len(click_df)}개 로드 완료")
+        print(f"[INFO] 검색 로그 {len(self.search_logs)}개, 클릭 로그 {len(self.click_logs)}개 로드 완료")
 
         return True
     
