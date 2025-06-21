@@ -1,8 +1,7 @@
 from utils.storage.mysql_manager import MySQLManager
-from config.mysql_config import MYSQL_CONFIG
 
 # 인스턴스 생성
-db = MySQLManager(MYSQL_CONFIG=MYSQL_CONFIG)
+db = MySQLManager()
 
 # 연결 테스트 
 try:
