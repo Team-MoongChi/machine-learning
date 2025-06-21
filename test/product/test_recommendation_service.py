@@ -1,4 +1,4 @@
-from recommendation.service.recommendation_repository import RecommendationRepository
+from product.service.recommendation_repository import RecommendationRepository
 
 def test_recommendation_service():
     # 서비스 인스턴스 생성

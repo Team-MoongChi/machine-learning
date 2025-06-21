@@ -1,6 +1,6 @@
 from utils.storage.s3_manager import S3Manager
 from utils.storage.opensearch_manager import OpenSearchManager
-from recommendation.transformer.recommendation_transformer import RecommendationTransformer
+from product.transformer.recommendation_transformer import RecommendationTransformer
 from config.opensearch_config import OPENSEARCH_CONFIG
 from typing import Dict, Any, Optional
 import logging
