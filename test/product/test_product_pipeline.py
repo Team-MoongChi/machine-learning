@@ -1,12 +1,14 @@
 import pandas as pd
 import numpy as np
 from collections import Counter
+import datetime
 
 from product.processor.data_processor import DataProcessor
 from product.processor.category_processor import CategoryProcessor
 from product.processor.product_score_processor import ProductSingleScoreProcessor
 from product.feature.user_profile import UserProfiler
 from product.embedding.embedding_generator import EmbeddingGenerator
+from product.embedding.faiss_manager import FAISSIndexManager
 
 def test_category_score_processor():
     # DataProcessor 인스턴스 생성 및 데이터 로드
@@ -110,6 +112,51 @@ def test_embedding_generator(scored_df, user_profiles):
     assert isinstance(query_text, str), "쿼리 텍스트는 문자열이어야 합니다."
     assert abs(np.linalg.norm(user_embedding) - 1.0) < 1e-5, "임베딩 L2 정규화 오류"
 
+    return product_embeddings, user_embedding
+
+def test_faiss_index_manager(product_embeddings, user_embedding, local_path='faiss.index', bucket=None, s3_key=None):
+    print("\n=== FAISSIndexManager 인덱스 테스트 ===")
+    faiss_manager = FAISSIndexManager()
+
+    # 인덱스 구축
+    index = faiss_manager.build_index(product_embeddings)
+    print(f"FAISS 인덱스 벡터 수: {index.ntotal}")
+
+    # 인덱스 로컬 저장
+    faiss_manager.save_index_to_local(local_path)
+    print(f"FAISS 인덱스 로컬 저장 완료: {local_path}")
+
+    # 인덱스 로컬 로드
+    faiss_manager.load_index_from_local(local_path)
+    print(f"FAISS 인덱스 로컬 로드 완료: {local_path}")
+
+    # S3 업로드/다운로드 테스트
+    if bucket and s3_key:
+        faiss_manager.save_index_to_S3(local_path, bucket, s3_key)
+        print(f"FAISS 인덱스 S3 업로드 완료: s3://{bucket}/{s3_key}")
+        
+        # S3에서 다운로드 및 로드
+        faiss_manager.load_index_from_s3(local_path, bucket, s3_key)
+        print(f"FAISS 인덱스 S3에서 다운로드 및 로드 완료")
+
+    # 인덱스 자동 로드 테스트
+    faiss_manager.auto_load_index(local_path, bucket, s3_key)
+    print("FAISS 인덱스 auto_load_index 테스트 완료")
+
+    # 검색 테스트
+    scores, indices = faiss_manager.search(user_embedding, k=4)
+    print("\n=== 사용자 임베딩 기반 유사 상품 검색 결과 ===")
+    print("유사도 점수:", scores)
+    print("상품 인덱스:", indices)
+
+    # 검증
+    # - 가장 유사한 4개의 결과 반환하는지 확인
+    assert len(scores) == 4, "검색 결과 개수 오류"
+    assert len(indices) == 4, "검색 인덱스 개수 오류"
+    assert all(isinstance(i, (int, np.integer)) for i in indices), "인덱스 타입 오류"
+    assert all(0 <= s <= 1 for s in scores), "유사도 점수 범위 오류 (L2 정규화 시 0~1)"
+
+
 if __name__ == "__main__":
     print("=== 카테고리/점수 파이프라인 테스트 ===")
     scored_df = test_category_score_processor()
@@ -118,4 +165,13 @@ if __name__ == "__main__":
     user_profiles = test_user_profile_processor(scored_df)
     
     print("\n=== EmbeddingGenerator 임베딩 테스트 ===")
-    test_embedding_generator(scored_df, user_profiles)
+    product_embeddings, user_embedding = test_embedding_generator(scored_df, user_profiles)
+    
+    today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+    bucket = "team6-mlops-bucket"
+    s3_key = f"faiss_index/{today_str}_index/faiss.index"
+
+    
+    print("\n=== FAISSIndexManager 인덱스 테스트 ===")
+    
+    test_faiss_index_manager(product_embeddings=product_embeddings, user_embedding=user_embedding, bucket=bucket, s3_key=s3_key)
