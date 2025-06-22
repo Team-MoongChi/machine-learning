@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from product.service.recommendation_repository import RecommendationRepository
+from product.repository.recommendation_repository import RecommendationRepository
 from utils.storage.s3_manager import S3Manager
 from utils.storage.opensearch_manager import OpenSearchManager
 
