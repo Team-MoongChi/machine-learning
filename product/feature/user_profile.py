@@ -27,4 +27,14 @@ class UserProfiler:
             return current_year - birth_year
         except Exception:
             return Exception("생년월일이 제대로 계산되지 않았습니다.")
-            
+    
+    def get_age_group(self, age: int) -> str:
+        """
+        나이를 연령대로 변환
+        """
+        if age < 30:
+            return '20대'
+        elif age < 40:
+            return '30대'
+        else:
+            return '40대+'
