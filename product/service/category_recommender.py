@@ -31,3 +31,14 @@ class CategoryRecommender:
         Returns:
             추천 후보 상품 딕셔너리 리스트
         """
+
+        # 카테고리 pool이 없거나, 추천 개수가 0 이하이면 빈 리스트 반환
+        if category not in self.category_pools or count <= 0:
+            return []
+
+        # pool에서 이미 추천된 상품, 이전에 추천된 상품 제외
+        pool = self.category_pools[category].copy()
+        pool = pool[~pool['id'].isin(used_product_ids | previous_recs)]
+
+        # 1인가구 적합도 점수 기준으로 내림차순 정렬
+        pool = pool.sort_values('flexible_single_score', ascending=False)
