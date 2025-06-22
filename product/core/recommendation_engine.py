@@ -34,4 +34,30 @@ class RecommendationEngine:
         # 사용자 프로필이 없으면 빈 결과 반환
         if user_id not in self.user_profiles:
             return pd.DataFrame()
+        
+        user_profile = self.user_profiles[user_id]
+
+        previous_recs = self.history_manager.get(user_id)  # 이전 추천 상품 ID 집합
+        used_product_ids = set()                        
+        preferred_category = user_profile.get('base_interest_category', '가공식품')
+        recommendations = []
+
+        # 선호 카테고리에서 2개 추천
+        recommendations += self.category_recommender.recommend(
+            preferred_category, 2, previous_recs, used_product_ids, user_profile, True
+        )
+        used_product_ids.update([rec['product_id'] for rec in recommendations])
+
+        # 나머지 카테고리에서 1개씩 추천
+        other_categories = [c for c in ['신선식품', '가공식품', '주방용품', '생활용품'] if c != preferred_category]
+        random.seed(user_id)  # 사용자별 고정 시드
+        random.shuffle(other_categories)
+        for category in other_categories:
+            if len(recommendations) >= top_k:
+                break
+            recs = self.category_recommender.recommend(
+                category, 1, previous_recs, used_product_ids, user_profile, False
+            )
+            recommendations += recs
+            used_product_ids.update([rec['product_id'] for rec in recs])
 
