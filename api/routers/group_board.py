@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 recommendation_service = GroupRecommendationService(
-    data_path="data",  
     s3_bucket="team6-mlops-bucket", 
     opensearch_index="group-recommendations"  
 )
