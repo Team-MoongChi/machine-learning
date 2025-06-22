@@ -54,3 +54,12 @@ class FAISSIndexManager:
         # FAISS 인덱스에서 쿼리 벡터와 가장 유사한 k개의 벡터를 검색 
         scores, indices = self.index.search(query_embedding, k)
         return scores[0], indices[0]
+    
+    def save_index_to_local(self, local_path: str):
+        """
+        현재 인덱스를 로컬 파일로 저장
+        """
+        if self.index is None:
+            raise ValueError("저장할 인덱스가 없습니다.")
+        faiss.write_index(self.index, local_path)
+        
