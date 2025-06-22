@@ -36,3 +36,26 @@ class SingleHouseHoldScoreCalculator:
         for keyword in cls.GOOD_KEYWORDS:
             if keyword in name_lower:
                 score += 8.0
+
+        # 가격대별 추가 점수
+        price = product.get('price', 0)
+        if price <= 5000:
+            score += 10.0  # 5천원 이하: 가성비 최우수
+        elif price <= 15000:
+            score += 7.0   # 1.5만원 이하: 적정 가격
+        elif price <= 30000:
+            score += 4.0   # 3만원 이하: 수용 가능
+
+        # 카테고리별 특화 키워드 보너스
+        category = product.get('large_category', '')
+
+        # 가공식품이면서 즉석/간편/밀키트가 상품명에 포함되면 5점 추가
+        if '가공식품' in category and any(w in name_lower for w in ['즉석', '간편', '밀키트']):
+            score += 5.0
+
+        # 주방용품이면서 실리콘/미니/소형이 상품명에 포함되면 5점 추가
+        elif '주방용품' in category and any(w in name_lower for w in ['실리콘', '미니', '소형']):
+            score += 5.0
+
+        # 최대 점수 25점으로 제한
+        return min(score, 25.0)
