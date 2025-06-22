@@ -31,3 +31,9 @@ class RecommendationHistoryManager:
         if len(self.history[user_id]) > 15:
             history_list = list(self.history[user_id])
             self.history[user_id] = set(history_list[-8:])
+
+    def get(self, user_id: int) -> set:
+        """
+        해당 사용자의 추천 히스토리 반환
+        """
+        return self.history.get(user_id, set(0))
