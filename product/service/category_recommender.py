@@ -42,3 +42,35 @@ class CategoryRecommender:
 
         # 1인가구 적합도 점수 기준으로 내림차순 정렬
         pool = pool.sort_values('flexible_single_score', ascending=False)
+
+        selected = []           # 최종 추천 후보 리스트
+        price_ranges_used = set()  # 가격대 다양성 확보용
+
+        # pool에서 count만큼 상품을 선택
+        for _, product in pool.iterrows():
+            if len(selected) >= count:
+                break
+
+            price = product.get('price', 0)
+
+            # 가격대별로 구간을 나눠 다양성 확보
+            price_range = 'low' if price < 8000 else 'mid' if price < 20000 else 'high'
+
+            # 선호 카테고리가 아닌 경우, 이미 선택한 가격대는 중복 피하기
+            if not is_preferred and price_range in price_ranges_used and len(selected) > 0:
+                continue
+
+            # 추천 데이터 구조화 - 부스팅 포함
+            rec_data = RecommendationDataBuilder.build(product, user_profile, is_preferred, self.products_df)
+            selected.append(rec_data)
+            price_ranges_used.add(price_range)
+
+        # 만약 count만큼 못 뽑았으면, 가격대 중복 허용하고 추가로 선택
+        if len(selected) < count:
+            remaining_pool = pool[~pool['id'].isin([rec['product_id'] for rec in selected])]
+            
+            for _, product in remaining_pool.head(count - len(selected)).iterrows():
+                rec_data = RecommendationDataBuilder.build(product, user_profile, is_preferred, self.products_df)
+                selected.append(rec_data)
+
+        return selected
