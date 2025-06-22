@@ -85,3 +85,14 @@ class FAISSIndexManager:
         s3 = boto3.client('s3')
         s3.download_file(bucket, s3_key, local_path)
         self.index = faiss.read_index(local_path)
+    
+    def auto_load_index(self, local_path: str, bucket: str, s3_key: str):
+        """
+        로컬에 인덱스 파일이 있으면 로컬에서, 없으면 S3에서 다운로드 후 로드
+        """
+        if os.path.exists(local_path):
+            print(f"로컬 인덱스 파일에서 로드: {local_path}")
+            self.load_index_from_local(local_path)
+        else:
+            print(f"S3에서 인덱스 파일 다운로드 후 로드: s3://{bucket}/{s3_key}")
+            self.load_index_from_s3(local_path, bucket, s3_key)
