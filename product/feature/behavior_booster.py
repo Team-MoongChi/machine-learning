@@ -42,3 +42,12 @@ class BehaviorBooster:
             if keyword.lower() in product_name_lower:
                 behavior_boost *= 1.8
                 break  # 한 번만 부스팅
+        
+        # 클릭 카테고리 부스팅
+        # 최근 클릭한 카테고리 중 현재 상품 카테고리가 있으면 1.2배 곱함
+        clicked_categories = user_profile.get('clicked_categories', [])
+        if product_category in clicked_categories:
+            behavior_boost *= 1.2
+
+        # 최종 배수는 3.5를 초과하지 않도록 제한
+        return min(behavior_boost, 3.5)
