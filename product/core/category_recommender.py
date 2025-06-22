@@ -1,8 +1,8 @@
 import pandas as pd
 from typing import Dict, List
 
-from processor.category_pool import CategoryPoolBuilder
-from processor.recommendation_data import RecommendationDataBuilder
+from product.processor.category_pool import CategoryPoolBuilder
+from product.processor.recommendation_data import RecommendationDataBuilder
 
 class CategoryRecommender:
     """
