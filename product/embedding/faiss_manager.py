@@ -71,4 +71,9 @@ class FAISSIndexManager:
             raise FileNotFoundError(f"인덱스 파일이 존재하지 않습니다:{local_path}")
         self.index = faiss.read_index(local_path)
     
-    
+    def save_index_to_S3(self, local_path: str, bucket: str, s3_key: str):
+        """
+        로컬 인덱스 파일을 S3에 업로드
+        """
+        s3 = boto3.client('s3')
+        s3.upload_file(local_path, bucket, s3_key)
