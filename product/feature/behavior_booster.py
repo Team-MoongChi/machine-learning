@@ -34,3 +34,11 @@ class BehaviorBooster:
             if not fav_product.empty and fav_product.iloc[0].get('large_category', '') == product_category:
                 behavior_boost *= 1.5
                 break  # 한 번만 부스팅
+        
+        # 검색 키워드 부스팅
+        # 최근 검색어(최대 2개) 중 하나라도 상품명에 포함되어 있으면 1.8배 곱함
+        search_keywords = user_profile.get('search_keywords', [])
+        for keyword in search_keywords[:2]:
+            if keyword.lower() in product_name_lower:
+                behavior_boost *= 1.8
+                break  # 한 번만 부스팅
