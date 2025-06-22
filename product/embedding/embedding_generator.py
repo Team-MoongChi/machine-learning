@@ -19,7 +19,7 @@ class EmbeddingGenerator:
             print(f"모델 로딩 실패({e}), 다국어 모델로 대체합니다.")
             self.model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
     
-    def generate_product_embeddings(self, products_df : pd.DataFrame) -> Tuple[np.ndarry, List[str]]:
+    def generate_product_embeddings(self, products_df : pd.DataFrame) -> Tuple[np.ndarray, List[str]]:
         """
         상품명 + 카테고리 텍스트로 임베딩 생성 
         
