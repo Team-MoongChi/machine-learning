@@ -9,6 +9,7 @@ from product.processor.product_score_processor import ProductSingleScoreProcesso
 from product.feature.user_profile import UserProfiler
 from product.embedding.embedding_generator import EmbeddingGenerator
 from product.embedding.faiss_manager import FAISSIndexManager
+from product.core.recommendation_engine import RecommendationEngine
 
 def test_category_score_processor():
     # DataProcessor 인스턴스 생성 및 데이터 로드
@@ -156,6 +157,54 @@ def test_faiss_index_manager(product_embeddings, user_embedding, local_path='fai
     assert all(isinstance(i, (int, np.integer)) for i in indices), "인덱스 타입 오류"
     assert all(0 <= s <= 1 for s in scores), "유사도 점수 범위 오류 (L2 정규화 시 0~1)"
 
+    return faiss_manager
+
+def test_recommendation_engine(
+    scored_df: pd.DataFrame,
+    user_profiles: dict,
+    faiss_manager: FAISSIndexManager,
+    embedding_generator: EmbeddingGenerator
+):
+    """
+    RecommendationEngine 엔드투엔드 테스트
+    """
+    print("\n=== RecommendationEngine 통합 테스트 ===")
+    
+    # 엔진 초기화
+    engine = RecommendationEngine(
+        products_df=scored_df,
+        faiss_manager=faiss_manager,
+        embedding_generator=embedding_generator,
+        user_profiles=user_profiles
+    )
+    
+    # 테스트할 사용자 선택 (첫 번째 사용자)
+    test_user_id = list(user_profiles.keys())[0]
+    print(f"테스트 사용자 ID: {test_user_id}")
+    print(f"사용자 프로필: {user_profiles[test_user_id]}")
+    
+    # 추천 실행
+    recommendations = engine.recommend(test_user_id, top_k=4)
+    
+    # 결과 검증
+    print("\n추천 결과:")
+    print(recommendations)
+    
+    # 검증 1: 결과가 DataFrame인지 확인
+    assert isinstance(recommendations, pd.DataFrame), "결과는 DataFrame이어야 함"
+    
+    # 검증 2: 추천 개수 확인 (최대 4개)
+    assert len(recommendations) <= 4, f"추천 개수 초과: {len(recommendations)}"
+    
+    # 검증 3: 중복 추천 확인
+    assert recommendations['product_id'].nunique() == len(recommendations), "중복 추천 발생"
+    
+    # 검증 4: 사용자 히스토리 업데이트 확인
+    history = engine.history_manager.get(test_user_id)
+    assert set(recommendations['product_id']).issubset(history), "히스토리 업데이트 실패"
+    
+    print("RecommendationEngine 테스트 통과")
+    return engine
 
 if __name__ == "__main__":
     print("=== 카테고리/점수 파이프라인 테스트 ===")
@@ -173,5 +222,13 @@ if __name__ == "__main__":
 
     
     print("\n=== FAISSIndexManager 인덱스 테스트 ===")
-    
-    test_faiss_index_manager(product_embeddings=product_embeddings, user_embedding=user_embedding, bucket=bucket, s3_key=s3_key)
+    faiss_manager = test_faiss_index_manager(product_embeddings=product_embeddings, user_embedding=user_embedding, bucket=bucket, s3_key=s3_key)
+
+    print("\n=== RecommendationEngine 통합 테스트 ===")
+    embedding_generator = EmbeddingGenerator()  # 실제 생성기 인스턴스
+    engine = test_recommendation_engine(
+        scored_df=scored_df,
+        user_profiles=user_profiles,
+        faiss_manager=faiss_manager,
+        embedding_generator=embedding_generator
+    )
