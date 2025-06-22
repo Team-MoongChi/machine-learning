@@ -24,7 +24,7 @@ class UserProfiler:
         profiles = {}
 
         for _, user in users_df.iterrows():
-            user_id = user['id']
+            user_id = user['user_id']
 
             # 기본 정보 추출
             base_interest = user.get('interest_category', None)
@@ -90,7 +90,7 @@ class UserProfiler:
             current_year = datetime.now().year  # 현재 연도 자동 추출
             return current_year - birth_year
         except Exception:
-            return Exception("생년월일이 제대로 계산되지 않았습니다.")
+            return 0
     
     def get_age_group(self, age: int) -> str:
         """
@@ -120,7 +120,7 @@ class UserProfiler:
         """
         categories = []
         for pid in product_ids:
-            product = self.products[self.products['id'] == pid]
+            product = self.products[self.products['product_id'] == pid]
             if not product.empty:
                 category = product.iloc[0].get('large_category', '')
                 if category:
