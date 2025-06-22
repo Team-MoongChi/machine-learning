@@ -1,5 +1,7 @@
 import pandas as pd
 from typing import Dict, List, Any
+from datetime import datetime
+
 from product.processor.data_processor import DataProcessor
 
 class UserProfiler:
@@ -14,4 +16,15 @@ class UserProfiler:
         self.search_logs = data_processor.search_logs
         self.click_logs = data_processor.click_logs
         self.favorite_products = data_processor.favorite_products
-    
+
+    def calculate_age(self, birth_str: str) -> int:
+        """
+        현재 년도를 가져와서 생년월일에서 나이를 계산 
+        """
+        try:
+            birth_year = int(str(birth_str)[:4])
+            current_year = datetime.now().year  # 현재 연도 자동 추출
+            return current_year - birth_year
+        except Exception:
+            return Exception("생년월일이 제대로 계산되지 않았습니다.")
+            
