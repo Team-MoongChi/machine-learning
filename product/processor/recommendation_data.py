@@ -54,7 +54,7 @@ class RecommendationDataBuilder:
 
         # 7. 추천 결과를 하나의 딕셔너리로 구조화하여 반환
         return {
-            'product_id': product['id'],                         # 상품 고유 ID
+            'product_id': product['product_id'],                         # 상품 고유 ID
             'name': product['name'],                             # 상품명
             'price': product.get('price', 0),                    # 가격
             'category_path': product.get('category_path', ''),   # 카테고리 경로

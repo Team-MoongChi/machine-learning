@@ -36,4 +36,4 @@ class RecommendationHistoryManager:
         """
         해당 사용자의 추천 히스토리 반환
         """
-        return self.history.get(user_id, set(0))
+        return self.history.get(user_id, set())

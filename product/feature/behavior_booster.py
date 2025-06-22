@@ -30,7 +30,7 @@ class BehaviorBooster:
         # 사용자가 최근 찜한 상품(최대 3개) 중 현재 상품과 같은 카테고리가 있으면 1.5배 곱함
         favorite_products = user_profile.get('favorite_product_ids', [])
         for fav_id in favorite_products[:3]:
-            fav_product = products_df[products_df['id'] == fav_id]
+            fav_product = products_df[products_df['product_id'] == fav_id]
             if not fav_product.empty and fav_product.iloc[0].get('large_category', '') == product_category:
                 behavior_boost *= 1.5
                 break  # 한 번만 부스팅
