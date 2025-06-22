@@ -104,3 +104,22 @@ class EmbeddingGenerator:
         query_parts += ['소포장', '미니', '1인용']
 
         return ' '.join(query_parts)
+
+    def get_user_embedding_summary(self, user_profile: Dict) -> Dict:
+        """
+        사용자 임베딩 및 쿼리 텍스트에 대한 요약 정보 반환 
+        """
+        embedding, query_text = self.generate_user_embedding(user_profile)
+        return {
+            'user_id': user_profile.get('user_id'),
+            'age_group': user_profile.get('age_group', '30대'),
+            'gender': user_profile.get('gender', 'M'),
+            'user_type': user_profile.get('user_type'),
+            'base_interest': user_profile.get('base_interest_category', ''),
+            'search_count': user_profile.get('search_count', 0),
+            'favorite_count': user_profile.get('favorite_count', 0),
+            'click_count': user_profile.get('click_count', 0),
+            'final_query_text': query_text,
+            'query_length': len(query_text.split()),
+            'embedding_norm': float(np.linalg.norm(embedding))
+        }
