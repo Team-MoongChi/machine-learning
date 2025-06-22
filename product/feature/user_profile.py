@@ -17,7 +17,63 @@ class UserProfiler:
         self.click_logs = data_processor.click_logs
         self.favorite_products = data_processor.favorite_products
     
-    def filter_by_useer(self, df: pd.DataFrame, user_id: Any) -> pd.DataFrame:
+    def create_user_profiles(self, users_df: pd.DataFrame) -> Dict[Any, Dict]:
+        """
+        모든 유저에 대해 행동 로그과 기본 정보를 종합해 프로필을 만들어 반환
+        """
+        profiles = {}
+
+        for _, user in users_df.iterrows():
+            user_id = user['id']
+
+            # 기본 정보 추출
+            base_interest = user.get('interest_category', None)
+            age = self.calculate_age(user.get('birth', None))
+            gender = user.get('gender', None)
+
+            # 행동 로그 추출
+            user_searches = self.filter_by_user(self.search_logs, user_id)
+            user_clicks = self.filter_by_user(self.click_logs, user_id)
+            user_favorites = self.filter_by_user(self.favorite_products, user_id)
+
+            # 최근 N개 행동데이터 추출 
+            search_keywords = user_searches['keyword'].dropna().tolist()[:10]
+            clicked_product_ids = user_clicks['product_id'].dropna().tolist()[:20]
+            favorite_product_ids = user_favorites['product_id'].dropna().astype(int).tolist()[:10]
+
+            # 선호 카테고리 추출
+            favorite_categories = self.extract_categories_from_products(favorite_product_ids)
+            clicked_categories = self.extract_categories_from_clicks(user_clicks)
+
+            # 활동량 기반 사용자 타입 분류
+            total_actions = len(search_keywords) + len(clicked_product_ids) + len(favorite_product_ids)
+            user_type = self.get_user_type(total_actions)
+
+            # 프로필 딕셔너리 생성
+            profiles[user_id] = {
+                'user_id': user_id,
+                'base_interest_category': base_interest,
+                'age_group': self.get_age_group(age),
+                'gender': gender,
+                'user_type': user_type,
+
+                # 행동 데이터
+                'search_keywords': search_keywords,
+                'clicked_product_ids': clicked_product_ids,
+                'favorite_product_ids': favorite_product_ids,
+                'favorite_categories': favorite_categories,
+                'clicked_categories': clicked_categories,
+
+                # 통계
+                'total_actions': total_actions,
+                'search_count': len(search_keywords),
+                'click_count': len(clicked_product_ids),
+                'favorite_count': len(favorite_product_ids)
+            }
+
+        return profiles
+
+    def filter_by_user(self, df: pd.DataFrame, user_id: Any) -> pd.DataFrame:
         """
         특정 사용자의 데이터만 필터링해서 반환
         """
