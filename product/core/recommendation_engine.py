@@ -2,7 +2,7 @@ import pandas as pd
 import random
 from typing import Dict, List
 
-from processor.recommendation_history import RecommendationHistoryManager
+from product.processor.recommendation_history import RecommendationHistoryManager
 from product.core.category_recommender import CategoryRecommender
 from product.core.faiss_fallback import FaissFallbackRecommender
 from product.core.emergency_recommender import EmergencyRecommender

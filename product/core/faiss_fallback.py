@@ -1,7 +1,7 @@
 import pandas as pd
 from typing import Dict, List, Set
 
-from processor.recommendation_data import RecommendationDataBuilder
+from product.processor.recommendation_data import RecommendationDataBuilder
 
 class FaissFallbackRecommender:
     """
