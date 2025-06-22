@@ -38,3 +38,14 @@ class UserProfiler:
             return '30대'
         else:
             return '40대+'
+    
+    def get_user_type(self, total_actions: int) -> str:
+        """
+        행동량(검색 + 클릭 + 찜)에 따라 사용자 분류
+        """
+        if total_actions <= 5:
+            return 'new'
+        elif total_actions <= 20:
+            return 'active'
+        else:
+            return 'power'
