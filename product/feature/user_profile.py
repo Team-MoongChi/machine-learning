@@ -49,3 +49,28 @@ class UserProfiler:
             return 'active'
         else:
             return 'power'
+    
+    def extract_categories_from_products(self, product_ids: List[int]) -> List[str]:
+        """
+        찜한 상품 ID 리스트에서 대분류 카테고리 추출
+        """
+        categories = []
+        for pid in product_ids:
+            product = self.products[self.products['id'] == pid]
+            if not product.empty:
+                category = product.iloc[0].get('large_category', '')
+                if category:
+                    categories.append(category)
+        return categories
+    
+    def extract_categories_from_clicks(self, user_clicks: pd.DataFrame) -> List[str]:
+        """
+        클릭 로그에서 이전에 추가한 item_category 컬럼에서 대분류만 추출
+        """
+        categories = []
+        for _, click in user_clicks.iterrows():
+            category_path = click.get('item_category', '')
+            if category_path and '>' in category_path:
+                large_category = category_path.split('>')[0].strip()
+                categories.append(large_category)
+        return categories
