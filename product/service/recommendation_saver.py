@@ -34,7 +34,7 @@ class RecommendationSaver:
         # 추천 결과 dict로 변환
         rec_result = recommended_products.to_dict(orient='records')
 
-        # 4. doc_id 생성
+        # doc_id 생성
         today = datetime.datetime.now().strftime("%Y%m%d")
         doc_id = f"{new_user_info.get('gender','unknown')}_{new_user_info.get('birth','unknown')}_{today}"
 
@@ -42,5 +42,29 @@ class RecommendationSaver:
         repository.save_to_s3(doc_id, rec_result)
         repository.save_to_opensearch(doc_id, rec_result)
         print(f"신규 사용자 추천 결과 S3/Opensearch 저장 완료: {doc_id}")
+
+        return rec_result
+
+    def recommend_for_existing_user(
+            user_id: int,
+            engine,
+            repository,  
+            top_k: int = 4
+        ) -> List[Dict[str, Any]]:
+        """
+        기존 사용자 추천: 엔진 추천 + 저장 
+        """
+        # 추천 엔진 실행
+        recommendations = engine.recommend(user_id, top_k=top_k)
+        rec_result = recommendations.to_dict(orient='records')
+
+        # doc_id 생성
+        today = datetime.datetime.now().strftime("%Y%m%d")
+        doc_id = f"{user_id}_{today}"
+
+        # S3와 opensearch에 저장
+        repository.save_to_s3(str(user_id), rec_result)
+        repository.save_to_opensearch(doc_id, rec_result)
+        print(f"기존 사용자 {user_id} 추천 결과 S3/Opensearch 저장 완료")
 
         return rec_result
