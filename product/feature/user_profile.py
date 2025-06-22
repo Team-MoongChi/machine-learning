@@ -11,11 +11,11 @@ class UserProfiler:
     다양한 정보를 추출하여 프로필 딕셔너리로 만드는 클래스
     """
 
-    def __init__(self, data_processor: DataProcessor):
-        self.products = data_processor.products
-        self.search_logs = data_processor.search_logs
-        self.click_logs = data_processor.click_logs
-        self.favorite_products = data_processor.favorite_products
+    def __init__(self, products: pd.DataFrame, search_logs: pd.DataFrame, click_logs: pd.DataFrame, favorite_products: pd.DataFrame):
+        self.products = products  # 이전에 전처리된 데이터프레임 받아야함
+        self.search_logs = search_logs
+        self.click_logs = click_logs
+        self.favorite_products = favorite_products
     
     def create_user_profiles(self, users_df: pd.DataFrame) -> Dict[Any, Dict]:
         """
