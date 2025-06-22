@@ -43,6 +43,29 @@ class EmbeddingGenerator:
         embeddings = normalize(embeddings, norm='l2', axis=1)
         return embeddings, product_texts
     
+    def generate_user_embedding(self, user_profile: Dict) -> Tuple[np.ndarray, str]:
+        """
+        사용자 한 명의 프로필로 쿼리 텍스트를 만들고, 임베딩을 생성
+
+        Args:
+            사용자 프로필 
+
+        Returns:
+            임베딩 벡터와 쿼리  텍스트
+        """
+        # 쿼리 텍스트 생성
+        query_text = self.build_query_text(user_profile)
+
+        # SBERT 임베딩 생성 (1D 벡터)
+        embedding = self.model.encode([query_text])
+
+        # L2 정규화 
+        # - 벡터의 크기를 1로 맞춰서 방향만으로 유사도 비교 가능
+        # - 벡터의 내적이 코사인 유사도가 됨 
+        embedding = normalize(embedding.reshape(1, -1), norm='l2')
+
+        return embedding, query_text
+    
     def build_query_text(self, user_profile: Dict) -> str:
         """
         사용자 프로필 정보를 바탕으로 임베딩용 쿼리 텍스트 생성
