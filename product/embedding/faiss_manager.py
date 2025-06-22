@@ -34,3 +34,23 @@ class FAISSIndexManager:
         self.index.add(self.normalized_embeddings.astype('float32'))
         return self.index
        
+    def search(self, query_embedding: np.ndarray, k: int=50) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        사용자 임베딩(1D 벡터)로 유사 상품 검색
+
+        Args:
+            query_embedding (np.ndarray): (D,) L2 정규화된 쿼리 임베딩
+            k (int): 반환할 유사 상품 개수
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: (유사도 점수 배열, 상품 인덱스 배열)
+        """
+        if self.index is None:
+            raise ValueError("FAISS 인덱스가 구축되지 않았습니다.")
+
+        query_embedding = query_embedding.reshape(1, -1).astype('float32')
+        query_embedding = query_embedding / np.linalg.norm(query_embedding)
+
+        # FAISS 인덱스에서 쿼리 벡터와 가장 유사한 k개의 벡터를 검색 
+        scores, indices = self.index.search(query_embedding, k)
+        return scores[0], indices[0]
