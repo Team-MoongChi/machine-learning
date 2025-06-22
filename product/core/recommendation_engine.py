@@ -61,3 +61,23 @@ class RecommendationEngine:
             recommendations += recs
             used_product_ids.update([rec['product_id'] for rec in recs])
 
+        # 부족하면 FAISS fallback(유사도 기반 추천)으로 보충
+        if len(recommendations) < top_k:
+            fallback = self.faiss_fallback.recommend(
+                user_profile, top_k - len(recommendations), used_product_ids
+            )
+            recommendations += fallback
+            used_product_ids.update([rec['product_id'] for rec in fallback])
+
+        # 그래도 부족하면 emergency 추천으로 보충
+        if len(recommendations) < top_k:
+            emergency = self.emergency_recommender.recommend(
+                top_k - len(recommendations), used_product_ids, user_id
+            )
+            recommendations += emergency
+
+        # 최종 추천 결과 DataFrame 변환 및 중복 제거
+        final_df = pd.DataFrame(recommendations[:top_k]).drop_duplicates(subset=['product_id']).head(top_k)
+        self.history_manager.update(user_id, final_df)  # 추천 히스토리 업데이트
+        return final_df
+
