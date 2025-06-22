@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [ main, fix/ci-cd ]
+    branches: [ main, fix/package-error ]
   pull_request:
     branches: [ main ]
 
