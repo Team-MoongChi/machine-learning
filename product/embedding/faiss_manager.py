@@ -77,3 +77,11 @@ class FAISSIndexManager:
         """
         s3 = boto3.client('s3')
         s3.upload_file(local_path, bucket, s3_key)
+    
+    def load_index_from_s3(self, local_path: str, bucket: str, s3_key: str):
+        """
+        S3에서 인덱스 파일을 다운로드 후 로컬에 저장 및 인덱스 로드
+        """
+        s3 = boto3.client('s3')
+        s3.download_file(bucket, s3_key, local_path)
+        self.index = faiss.read_index(local_path)
