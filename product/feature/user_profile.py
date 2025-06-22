@@ -16,6 +16,14 @@ class UserProfiler:
         self.search_logs = data_processor.search_logs
         self.click_logs = data_processor.click_logs
         self.favorite_products = data_processor.favorite_products
+    
+    def filter_by_useer(self, df: pd.DataFrame, user_id: Any) -> pd.DataFrame:
+        """
+        특정 사용자의 데이터만 필터링해서 반환
+        """
+        if df is not None and not df.empty:
+            return df[df['user_id'] == user_id]
+        return pd.DataFrame()
 
     def calculate_age(self, birth_str: str) -> int:
         """
