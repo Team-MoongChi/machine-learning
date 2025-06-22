@@ -62,4 +62,13 @@ class FAISSIndexManager:
         if self.index is None:
             raise ValueError("저장할 인덱스가 없습니다.")
         faiss.write_index(self.index, local_path)
-        
+    
+    def load_index_from_local(self, local_path: str):
+        """
+        로컬 파일에서 인덱스를 로드
+        """
+        if not os.path.exists(local_path):
+            raise FileNotFoundError(f"인덱스 파일이 존재하지 않습니다:{local_path}")
+        self.index = faiss.read_index(local_path)
+    
+    
