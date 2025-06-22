@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from product.service.recommendation_repository import RecommendationRepository
+from product.repository.recommendation_repository import RecommendationRepository
 import logging
 
 # 로깅 설정
