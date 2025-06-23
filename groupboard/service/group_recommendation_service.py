@@ -8,11 +8,12 @@ from datetime import datetime, timedelta
 from utils.storage.s3_manager import S3Manager
 from utils.storage.opensearch_manager import OpenSearchManager
 import json
+from config.opensearch_mappings import GROUP_RECOMMENDATION_MAPPING
 
 class GroupRecommendationService:
     """공구방 추천 서비스 메인 클래스"""
     
-    def __init__(self, s3_bucket: str, opensearch_index: str):
+    def __init__(self, s3_bucket: str, opensearch_index: str, mapping = GROUP_RECOMMENDATION_MAPPING):
         self.data_processor = DataProcessor()
         self.recommendation_engine = None
         self.response_formatter = ResponseTransformer()
@@ -20,7 +21,7 @@ class GroupRecommendationService:
 
         # 저장소 매니저 초기화
         self.s3_manager = S3Manager(s3_bucket)
-        self.opensearch = OpenSearchManager(opensearch_index)
+        self.opensearch = OpenSearchManager(opensearch_index, mapping)
         
     def initialize(self) -> bool:
         """데이터 로드 및 서비스 초기화"""
@@ -30,6 +31,27 @@ class GroupRecommendationService:
         self.recommendation_engine = RecommendationEngine(self.data_processor)
         logging.info("공구방 추천 서비스 초기화 완료")
         return True
+
+    def upload_new_recommendation(self, s3_key: str, user_id: int, address: str, top_n: int = 6) -> list:
+        """추천 생성 후 S3, OpenSearch에 모두 저장"""
+        rec = self.recommendation_engine.get_user_recommendations(user_id, address, top_n)
+        if rec is None:
+            print(f"추천 생성 실패: user_id={user_id}")
+            return None
+        
+        doc_id = f"user_{user_id}"
+        formatted_result = self.response_formatter.to_s3_doc(rec)
+        formatted_op_result = self.response_formatter.to_opensearch_doc(doc_id, rec)
+        
+        # S3 저장
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        user_s3_key = f"{s3_key}/user_{user_id}/group_{timestamp}.json"
+        self.s3_manager.upload(user_s3_key, formatted_result)
+        
+        # OpenSearch 저장
+        self.opensearch.upload(doc_id, formatted_op_result)
+        
+        return rec
     
     def upload_all_recommendations(self, s3_key: str, top_n: int = 6) -> list:
         """
