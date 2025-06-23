@@ -4,6 +4,7 @@ import datetime
 import logging
 
 from product.repository.recommendation_repository import RecommendationRepository
+from product.feature.user_profile import UserProfiler
 
 logger = logging.getLogger(__name__)
 
@@ -24,8 +25,10 @@ class RecommendationSaver:
         """
         신규 사용자 추천: 실시간 임베딩 생성 + FAISS 유사도 기반 Top-K 추천 + 저장
         """
+        new_user_profile = UserProfiler.create_new_user_profile(new_user_info)
+
         # 신규 사용자 임베딩 벡터 생성
-        user_embedding, query_text = embedding_generator.generate_user_embedding(new_user_info)
+        user_embedding, query_text = embedding_generator.generate_user_embedding(new_user_profile)
 
         # FAISS 인덱스에서 유사 상품 Top-K 검색
         scores, indices = faiss_manager.search(user_embedding, k=top_k)
