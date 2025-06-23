@@ -13,9 +13,9 @@ STATUS_WEIGHTS = {
 # 시간 가중치 함수
 def get_time_weight(days: int) -> float:
     """최근일수록 높은 가중치 반환"""
-    if days <= 7:
+    if days <= 4:
         return 1.0
-    elif days <= 14:
+    elif days <= 7:
         return 0.8
     else:
         return 0.6
