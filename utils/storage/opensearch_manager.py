@@ -5,7 +5,7 @@ import logging
 import json
 
 class OpenSearchManager:
-    def __init__(self, index: str):
+    def __init__(self, index: str, mapping: dict = None):
         self.client = OpenSearch(
             hosts=[{'host': OPENSEARCH_CONFIG["host"], 'port': OPENSEARCH_CONFIG["port"]}],
             http_auth=(OPENSEARCH_CONFIG["username"], OPENSEARCH_CONFIG["password"]),
@@ -17,7 +17,7 @@ class OpenSearchManager:
             retry_on_timeout=True
             )
         self.index = index
-        self.mapping = GROUP_RECOMMENDATION_MAPPING
+        self.mapping = mapping or GROUP_RECOMMENDATION_MAPPING
     
     def create_index(self) -> bool:
         """인덱스가 없을 경우에만 생성"""
