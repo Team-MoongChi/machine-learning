@@ -17,6 +17,38 @@ class UserProfiler:
         self.click_logs = click_logs
         self.favorite_products = favorite_products
     
+    @staticmethod
+    def create_new_user_profile(user_info: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        신규 사용자의 기본 정보 기반 프로필 생성
+        """
+        
+        age = UserProfiler.calculate_age(user_info["birth"])
+        age_group = UserProfiler.get_age_group(age)
+
+        profile = {
+            "user_id": user_info["user_id"],
+            "base_interest_category": user_info.get("interestCategory", None),
+            "age_group": age_group,
+            "gender": user_info.get("gender", None),
+            "user_type": "new_user",
+
+            # 행동 데이터 없음
+            "search_keywords": [],
+            "clicked_product_ids": [],
+            "favorite_product_ids": [],
+            "favorite_categories": [],
+            "clicked_categories": [],
+
+            # 통계 기본값
+            "total_actions": 0,
+            "search_count": 0,
+            "click_count": 0,
+            "favorite_count": 0
+        }
+
+        return profile
+    
     def create_user_profiles(self, users_df: pd.DataFrame) -> Dict[Any, Dict]:
         """
         모든 유저에 대해 행동 로그과 기본 정보를 종합해 프로필을 만들어 반환
@@ -28,7 +60,7 @@ class UserProfiler:
 
             # 기본 정보 추출
             base_interest = user.get('interest_category', None)
-            age = self.calculate_age(user.get('birth', None))
+            age = UserProfiler.calculate_age(user.get('birth', None))
             gender = user.get('gender', None)
 
             # 행동 로그 추출
@@ -53,7 +85,7 @@ class UserProfiler:
             profiles[user_id] = {
                 'user_id': user_id,
                 'base_interest_category': base_interest,
-                'age_group': self.get_age_group(age),
+                'age_group': UserProfiler.get_age_group(age),
                 'gender': gender,
                 'user_type': user_type,
 
@@ -81,7 +113,8 @@ class UserProfiler:
             return df[df['user_id'] == user_id]
         return pd.DataFrame()
 
-    def calculate_age(self, birth_str: str) -> int:
+    @staticmethod
+    def calculate_age(birth_str: str) -> int:
         """
         현재 년도를 가져와서 생년월일에서 나이를 계산 
         """
@@ -92,7 +125,8 @@ class UserProfiler:
         except Exception:
             return 0
     
-    def get_age_group(self, age: int) -> str:
+    @staticmethod
+    def get_age_group(age: int) -> str:
         """
         나이를 연령대로 변환
         """
