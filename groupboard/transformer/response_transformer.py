@@ -19,8 +19,12 @@ class ResponseTransformer:
                     "group_id": str(group['group_board_id']),
                     "title": str(group['title']),
                     "location": str(group['location']),
-                    "recent_favorites": int(group['recent_favorites']),
-                    "latest_favorite": str(group['latest_favorite'].isoformat()),  # ISO8601 string
+                    "recent_favorites": int(group.get("recent_favorites", 0) or 0),
+                    "latest_favorite": (
+                        str(group["latest_favorite"].isoformat())
+                        if pd.notnull(group.get("latest_favorite"))
+                        else None
+                    ),
                 }
                 for group in result['groups']
             ]
@@ -41,11 +45,15 @@ class ResponseTransformer:
                     "title": str(group['title']),
                     "location": str(group['location']),
                     "status": str(group['status']),
-                    "recent_favorites": int(group['recent_favorites']),
-                    "popularity_score": round(float(group['popularity_score']), 2),
-                    "latest_favorite": str(group['latest_favorite']),
-                    "days_since_latest": int(group['days_since_latest']),
-                    "time_weight": round(float(group['time_weight']), 2),
+                    "recent_favorites": int(group.get("recent_favorites") or 0),
+                    "popularity_score": round(float(group.get("popularity_score") or 0.0), 2),
+                    "latest_favorite": (
+                        str(group.get("latest_favorite"))
+                        if pd.notna(group.get("latest_favorite"))
+                        else None
+                    ),
+                    "days_since_latest": int(group.get("days_since_latest") or 0),
+                    "time_weight": round(float(group.get("time_weight") or 0.0), 2),
                 }
                 for group in result['groups']
             ]
