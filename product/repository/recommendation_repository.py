@@ -4,12 +4,13 @@ from product.transformer.recommendation_transformer import RecommendationTransfo
 from config.opensearch_config import OPENSEARCH_CONFIG
 from typing import Dict, Any, Optional
 import logging
+import datetime
 logger = logging.getLogger(__name__)
 
 class RecommendationRepository:
-    def __init__(self, s3_bucket: str, opensearch_index: str):
+    def __init__(self, s3_bucket: str, opensearch_index: str, mapping: dict):
         self.s3 = S3Manager(s3_bucket)
-        self.opensearch = OpenSearchManager(opensearch_index)
+        self.opensearch = OpenSearchManager(opensearch_index, mapping)
         self.transformer = RecommendationTransformer()
 
     def save_to_opensearch(self, doc_id: str, recommendation_data: Dict[str, Any]) -> bool:
@@ -27,12 +28,9 @@ class RecommendationRepository:
             logger.error(f"Failed to save recommendation to OpenSearch: {str(e)}")
             return False
 
-    def save_to_s3(self, user_id: str, recommendation_data: Dict[str, Any]) -> bool:
+    def save_to_s3(self, s3_key: str, recommendation_data: Dict[str, Any]) -> bool:
         """S3에 추천 데이터 저장"""
         try:
-            # S3 키 생성
-            s3_key = f"recommendations/user_{user_id}.json"
-            
             # S3에 저장 (원본 데이터 저장)
             self.s3.upload(key=s3_key, data=recommendation_data)
             logger.info(f"Successfully saved recommendation to S3: {s3_key}")
@@ -47,6 +45,8 @@ class RecommendationRepository:
         try:
             # OpenSearch에서 조회
             core_data = self.opensearch.get(doc_id=doc_id)
+
+            print(core_data)
             
             if not core_data:
                 logger.warning(f"No recommendation found in OpenSearch: {doc_id}")
