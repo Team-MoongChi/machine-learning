@@ -39,12 +39,12 @@ class GroupRecommendationService:
             print(f"추천 생성 실패: user_id={user_id}")
             return None
         
-        doc_id = f"user_{user_id}"
         formatted_result = self.response_formatter.to_s3_doc(rec)
         formatted_op_result = self.response_formatter.to_opensearch_doc(doc_id, rec)
         
         # S3 저장
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        doc_id = f"user_{user_id}_{timestamp}"
         user_s3_key = f"{s3_key}/user_{user_id}/group_{timestamp}.json"
         self.s3_manager.upload(user_s3_key, formatted_result)
         
