@@ -6,6 +6,9 @@ from product.processor.data_processor import DataProcessor
 from product.processor.category_processor import CategoryProcessor
 from product.processor.product_score_processor import ProductSingleScoreProcessor
 from product.feature.user_profile import UserProfiler
+from product.embedding.embedding_generator import EmbeddingGenerator
+from product.embedding.faiss_manager import FAISSIndexManager
+from product.core.recommendation_engine import RecommendationEngine
 from product.service.recommendation_saver import RecommendationSaver
 
 class RecommendationService:
@@ -38,7 +41,7 @@ class RecommendationService:
         self.scored_df = scored_df
         return scored_df
 
-    def user_profile_pipeline(self, scored_df: pd.DataFrame) -> dict:
+    def user_profile_pipeline(self, scored_df: pd.DataFrame, user_profile: Dict) -> Dict:
         """
         사용자 로그 및 상품 데이터를 활용해 사용자별 프로필을 생성
         """
@@ -53,3 +56,26 @@ class RecommendationService:
         user_profiles = profiler.create_user_profiles(self.dp.users)
         self.user_profiles = user_profiles
         return user_profiles
+    
+    def embedding_pipeline(self, scored_df: pd.DataFrame, user_profile: Dict):
+        """
+        상품 임베딩 및 단일 사용자 임베딩 벡터를 생성
+        """
+        embedding_generator = EmbeddingGenerator()
+        product_embeddings, _ = embedding_generator.generate_product_embeddings(scored_df)
+        user_embedding, _ = embedding_generator.generate_user_embedding(user_profile)
+        self.embedding_generator = embedding_generator
+        self.product_embeddings = product_embeddings
+        self.user_embedding = user_embedding
+
+    def recommendation_engine_pipeline(self, scored_df, user_profiles, faiss_manager, embedding_generator):
+        """
+        5. 추천 엔진을 준비합니다.
+        """
+        engine = RecommendationEngine(
+            products_df=scored_df,
+            faiss_manager=faiss_manager,
+            embedding_generator=embedding_generator,
+            user_profiles=user_profiles
+        )
+        self.engine = engine
