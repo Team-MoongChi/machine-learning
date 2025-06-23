@@ -67,10 +67,26 @@ class RecommendationService:
         self.embedding_generator = embedding_generator
         self.product_embeddings = product_embeddings
         self.user_embedding = user_embedding
+    
+    def faiss_pipeline(self, product_embeddings, user_embedding, local_path='faiss.index', bucket=None, s3_key=None):
+        """
+        FAISS 인덱스를 구축하고, S3와 로컬에 저장 및 복구를 수행
+        """
+        faiss_manager = FAISSIndexManager()
+        faiss_manager.build_index(product_embeddings)
+        faiss_manager.save_index_to_local(local_path)
+        faiss_manager.load_index_from_local(local_path)
+        if bucket and s3_key:
+            faiss_manager.save_index_to_S3(local_path, bucket, s3_key)
+            faiss_manager.load_index_from_s3(local_path, bucket, s3_key)
+        faiss_manager.auto_load_index(local_path, bucket, s3_key)
+        faiss_manager.search(user_embedding, k=4)
+        self.faiss_manager = faiss_manager
+
 
     def recommendation_engine_pipeline(self, scored_df, user_profiles, faiss_manager, embedding_generator):
         """
-        5. 추천 엔진을 준비합니다.
+        추천 엔진
         """
         engine = RecommendationEngine(
             products_df=scored_df,
@@ -79,3 +95,16 @@ class RecommendationService:
             user_profiles=user_profiles
         )
         self.engine = engine
+    
+    def save_all_user_recommendations(self, user_profiles, engine, repository, top_k=4):
+        """
+        모든 사용자에 대해 추천을 생성하고, S3/Opensearch에 저장
+        """
+        for user_id in user_profiles.keys():
+            RecommendationSaver.recommend_for_existing_user(
+                user_id=user_id,
+                engine=engine,
+                repository=repository,
+                top_k=top_k
+            )
+    
