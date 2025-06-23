@@ -26,11 +26,14 @@ def get_popular_groups(user_id: int, top_n: int = 6) -> JSONResponse:
             logger.info(f"캐시된 추천 결과 반환 ({cached_result['timestamp']})")
             return JSONResponse(content=cached_result)
         
-        # 새로운 추천 결과 생성
-        logger.info(f"새로운 추천 결과 생성")
-        result = recommendation_service.get_recommendations(user_id, top_n)
-        
-        return JSONResponse(content=result)
+        logger.info(f"추천 결과 없음: user_id={user_id}")
+        return JSONResponse(
+            content={
+                "status": "error",
+                "message": f"사용자 {user_id}의 추천 결과가 없습니다.",
+                "data": None
+            }
+    )
         
     except Exception as e:
         logger.error(f"추천 처리 실패: {str(e)}")
