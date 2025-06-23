@@ -2,6 +2,7 @@ import datetime
 from typing import Dict, Any, List
 import pandas as pd
 
+from config.opensearch_mappings import PRODUCT_MAPPING
 from product.processor.data_processor import DataProcessor
 from product.processor.category_processor import CategoryProcessor
 from product.processor.product_score_processor import ProductSingleScoreProcessor
@@ -10,15 +11,15 @@ from product.embedding.embedding_generator import EmbeddingGenerator
 from product.embedding.faiss_manager import FAISSIndexManager
 from product.core.recommendation_engine import RecommendationEngine
 from product.service.recommendation_saver import RecommendationSaver
+from product.repository.recommendation_repository import RecommendationRepository
 
 class RecommendationService:
     """
     데이터 준비, 임베딩, 인덱스, 추천 엔진, 추천 결과 저장까지
     전체 파이프라인 담당 클래스
     """
-    def __init__(self, s3_key: str, bucket: str = "team6-mlops-bucket"):
+    def __init__(self, bucket: str = "team6-mlops-bucket"):
         self.bucket=bucket
-        self.s3_key=s3_key
         self.dp=DataProcessor()
         self.scored_df=None
         self.user_profiles = None
@@ -27,7 +28,11 @@ class RecommendationService:
         self.faiss_manager = None
         self.embedding_generator = None
         self.engine = None
-        self.repository = None
+        self.repository = RecommendationRepository(
+            s3_bucket="team6-mlops-bucket",
+            opensearch_index="recommendations",
+            mapping=PRODUCT_MAPPING
+        )
     
     def category_score_pipeline(self) -> pd.DataFrame:
         """
@@ -41,7 +46,7 @@ class RecommendationService:
         self.scored_df = scored_df
         return scored_df
 
-    def user_profile_pipeline(self, scored_df: pd.DataFrame, user_profile: Dict) -> Dict:
+    def user_profile_pipeline(self, scored_df: pd.DataFrame) -> Dict:
         """
         사용자 로그 및 상품 데이터를 활용해 사용자별 프로필을 생성
         """
@@ -68,10 +73,14 @@ class RecommendationService:
         self.product_embeddings = product_embeddings
         self.user_embedding = user_embedding
     
-    def faiss_pipeline(self, product_embeddings, user_embedding, local_path='faiss.index', bucket=None, s3_key=None):
+    def faiss_pipeline(self, product_embeddings, user_embedding, local_path='faiss.index'):
         """
         FAISS 인덱스를 구축하고, S3와 로컬에 저장 및 복구를 수행
         """
+        today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+        bucket = "team6-mlops-bucket"
+        s3_key = f"faiss_index/{today_str}_index/faiss.index"
+
         faiss_manager = FAISSIndexManager()
         faiss_manager.build_index(product_embeddings)
         faiss_manager.save_index_to_local(local_path)
@@ -107,4 +116,31 @@ class RecommendationService:
                 repository=repository,
                 top_k=top_k
             )
+    
+    def run_full_pipeline(self):
+        """
+        전체 파이프라인
+        """
+        scored_df = self.category_score_pipeline()
+        user_profiles = self.user_profile_pipeline(scored_df)
+        self.embedding_pipeline(scored_df, user_profiles)
+        self.faiss_pipeline(
+            self.product_embeddings, 
+            self.user_embedding,
+            local_path='faiss.index'
+        )
+        # 추천 엔진 준비
+        self.recommendation_engine_pipeline(
+            scored_df,
+            user_profiles,
+            self.faiss_manager,
+            self.embedding_generator
+        )
+        # 추천 결과 저장소 준비 및 전체 사용자 추천 결과 저장
+        self.save_all_user_recommendations(
+            user_profiles=user_profiles,
+            engine=self.engine,
+            repository=self.repository,
+            top_k=4
+        )
     
