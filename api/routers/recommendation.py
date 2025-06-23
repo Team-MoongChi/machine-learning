@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from product.repository.recommendation_repository import RecommendationRepository
 import logging
+from config.opensearch_mappings import PRODUCT_MAPPING
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -11,11 +12,12 @@ router = APIRouter()
 # RecommendationService 인스턴스 생성
 service = RecommendationRepository(
         s3_bucket="team6-mlops-bucket",
-        opensearch_index="recommendations"
+        opensearch_index="recommendations",
+        mapping=PRODUCT_MAPPING
     )
 
 @router.get("/recommendations/{user_id}")
-def get_recommendations(user_id: str):
+def get_recommendations(user_id: int):
     """
     사용자별 추천 결과를 조회
     """
