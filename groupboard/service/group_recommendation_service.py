@@ -85,7 +85,7 @@ class GroupRecommendationService:
 
             formatted_recommendations.append(formatted_result)
 
-        return formatted_result
+        return formatted_recommendations
 
     def get_recommendation_from_opensearch(self, user_id: str) -> Dict:
         """최근 14일 이내에 생성된 추천 결과 중 가장 최근 문서를 OpenSearch에서 조회"""
