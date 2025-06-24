@@ -33,8 +33,8 @@ def generate_and_store_user_recommendation(
     rec = service.upload_new_recommendation(s3_key=s3_key, user_id=user_id, address=address, top_n=top_n)
     return rec if rec else None
 
-@flow(name="group-board-flow")
-def generate_all_recommendations_flow(top_n: int = 6):
+@flow(name="group_board_flow")
+def group_board_flow(top_n: int = 6):
     service = initialize_service()
     user_ids = get_all_user_ids(service)
 
@@ -48,4 +48,4 @@ def generate_all_recommendations_flow(top_n: int = 6):
     return recommendations
 
 if __name__ == "__main__":
-    generate_all_recommendations_flow()
+    group_board_flow()
