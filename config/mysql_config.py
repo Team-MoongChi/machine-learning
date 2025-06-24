@@ -1,21 +1,17 @@
-import asyncio
 from prefect.blocks.system import Secret
 
-async def load_mysql_config():
-    url = await Secret.load("mysql-url")
-    database = await Secret.load("mysql-database")
-    port = await Secret.load("mysql-port")
-    username = await Secret.load("mysql-username")
-    password = await Secret.load("mysql-password")  # 오타 주의
+MYSQL_URL = Secret.load("mysql-url")
+MYSQL_DATABASE = Secret.load("mysql-database")
+MYSQL_PORT = Secret.load("mysql-port")
+MYSQL_USERNAME = Secret.load("mysql-username")
+MYSQL_PASSWORD = Secret.load("mysql-passowrd")
 
-    return {
-        "url": url.get(),
-        "database": database.get(),
-        "port": port.get(),
-        "username": username.get(),
-        "password": password.get(),
-        "charset": "utf8mb4",
-        "timezone": "Asia/Seoul",
-    }
-
-MYSQL_CONFIG = asyncio.run(load_mysql_config())
+MYSQL_CONFIG = {
+    "url": MYSQL_URL.get,
+    "database": MYSQL_DATABASE,
+    "port": MYSQL_PORT,
+    "username": MYSQL_USERNAME,
+    "password": MYSQL_PASSWORD,
+    "charset": "utf8mb4",
+    "timezone": "Asia/Seoul",
+}
