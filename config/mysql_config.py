@@ -1,14 +1,17 @@
-import os
-from dotenv import load_dotenv
+from prefect.blocks.system import Secret
 
-load_dotenv()
+MYSQL_URL = Secret.load("mysql-url")
+MYSQL_DATABASE = Secret.load("mysql-database")
+MYSQL_PORT = Secret.load("mysql-port")
+MYSQL_USERNAME = Secret.load("mysql-username")
+MYSQL_PASSWORD = Secret.load("mysql-passowrd")
 
 MYSQL_CONFIG = {
-    "url": os.getenv("MYSQL_URL"),
-    "database": os.getenv("MYSQL_DATABASE"),
-    "port": int(os.getenv("MYSQL_PORT", 3306)),
-    "username": os.getenv("MYSQL_USERNAME"),
-    "password": os.getenv("MYSQL_PASSWORD"),
+    "url": MYSQL_URL.get(),
+    "database": MYSQL_DATABASE.get(),
+    "port": MYSQL_PORT.get(),
+    "username": MYSQL_USERNAME.get(),
+    "password": MYSQL_PASSWORD.get(),
     "charset": "utf8mb4",
     "timezone": "Asia/Seoul",
 }
