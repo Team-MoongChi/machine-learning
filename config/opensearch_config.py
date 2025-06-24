@@ -1,19 +1,13 @@
-import asyncio
 from prefect.blocks.system import Secret
 
-from prefect.blocks.system import Secret
+OPENSEARCH_HOST = Secret.load("opensearch-host")
+OPENSEARCH_PORT = Secret.load("opensearch-port")
+OPENSEARCH_USERNAME = Secret.load("opensearch-username")
+OPENSEARCH_PASSWORD = Secret.load("opensearch-password")
 
-async def load_opensearch_config():
-    host = await Secret.load("opensearch-host")
-    port = await Secret.load("opensearch-port")
-    username = await Secret.load("opensearch-username")
-    password = await Secret.load("opensearch-password")
-
-    return {
-        "host": host.get(),
-        "port": port.get(),
-        "username": username.get(),
-        "password": password.get()
-    }
-
-OPENSEARCH_CONFIG = asyncio.run(load_opensearch_config())
+OPENSEARCH_CONFIG = {
+    "host": OPENSEARCH_HOST,
+    "port": OPENSEARCH_PORT,
+    "username": OPENSEARCH_USERNAME,
+    "password": OPENSEARCH_PASSWORD
+}
