@@ -52,7 +52,7 @@ class PopularityEngine:
     
     def fill_missing_activity(self, result: pd.DataFrame) -> pd.DataFrame:
         """활동 없는 공구방의 기본값 보정 - 모든 공구방에 대해 인기도 점수 계산 필요"""
-        result['group_board_id'] = result['group_board_id'].fillna(result['id']).astype(int)
+        result['group_board_id'] = result['group_board_id'].astype(int)
         result['recent_favorites'] = result['recent_favorites'].fillna(0).astype(int)
         result['latest_favorite'] = result['latest_favorite'].fillna(pd.Timestamp.now() - pd.Timedelta(days=999))
         return result
