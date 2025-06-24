@@ -1,6 +1,9 @@
-name: group-board-flow
-entrypoint: flows/group_board_flow.py:generate_all_recommendations_flow
-
-pull:
-  url: https://github.com/Team-MoongChi/machine-learning.git
-  branch: feat/prefect-flows
+deployments:
+  - name: group-board-flow
+    entrypoint: flows/group_board_flow.py:generate_all_recommendations_flow
+    work_pool:
+      name: cloud_deploy
+    steps:
+      - prefect.deployments.steps.git_clone:
+          repository: https://github.com/Team-MoongChi/machine-learning.git
+          branch: feat/prefect-flows
