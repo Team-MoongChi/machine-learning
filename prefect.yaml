@@ -1,9 +1,22 @@
 deployments:
   - name: group-board-flow
-    entrypoint: flows/group_board_flow.py:generate_all_recommendations_flow
+    entrypoint: flows/group_board_flow.py:group_board_flow   # 함수명이 이게 맞다면!
     work_pool:
       name: cloud_deploy
     steps:
       - prefect.deployments.steps.git_clone:
           repository: https://github.com/Team-MoongChi/machine-learning.git
           branch: feat/prefect-flows
+    infra_overrides:
+      env:
+        OPENSEARCH_HOST: "{{ prefect.blocks.secret.moongchi-secret.opensearch_host }}"
+        OPENSEARCH_PORT: "{{  prefect.blocks.secret.moongchi-secret.opensearch_port }}"
+        OPENSEARCH_USERNAME: "{{  prefect.blocks.secret.moongchi-secret.opensearch_username }}"
+        OPENSEARCH_PASSWORD: "{{  prefect.blocks.secret.moongchi-secret.opensearch_password }}"
+        AWS_ACCESS_KEY_ID: "{{  prefect.blocks.secret.moongchi-secret.aws_access_key_id }}"
+        AWS_SECRET_ACCESS_KEY: "{{  prefect.blocks.secret.moongchi-secret.aws_secret_access_key }}"
+        MYSQL_URL: "{{  prefect.blocks.secret.moongchi-secret.mysql_url }}"
+        MYSQL_PORT: "{{  prefect.blocks.secret.moongchi-secret.mysql_port }}"
+        MYSQL_DATABASE: "{{  prefect.blocks.secret.moongchi-secret.mysql_database }}"
+        MYSQL_USERNAME: "{{  prefect.blocks.secret.moongchi-secret.mysql_username }}"
+        MYSQL_PASSWORD: "{{  prefect.blocks.secret.moongchi-secret.mysql_password }}"
