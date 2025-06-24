@@ -21,3 +21,4 @@ deployments:
         MYSQL_DATABASE: "{{  prefect.blocks.secret.mysql-database }}"
         MYSQL_USERNAME: "{{  prefect.blocks.secret.mysql-username }}"
         MYSQL_PASSWORD: "{{  prefect.blocks.secret.mysql-password }}"
+    requirements: requirements.txt
