@@ -2,7 +2,8 @@ deployments:
   - name: group-board-flow
     entrypoint: flows/group_board_flow.py:group_board_flow   # 함수명이 이게 맞다면!
     work_pool:
-      name: cloud_deploy
+      name: default-work-pool
+
     steps:
       - prefect.deployments.steps.git_clone:
           repository: https://github.com/Team-MoongChi/machine-learning.git
