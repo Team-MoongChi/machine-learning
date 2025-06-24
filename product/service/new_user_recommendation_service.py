@@ -1,5 +1,5 @@
 from typing import Dict, List, Any
-import datetime
+from datetime import datetime, timedelta
 
 from config.opensearch_mappings import PRODUCT_MAPPING
 from product.processor.data_processor import DataProcessor
@@ -25,13 +25,13 @@ class NewUserRecommendationService:
         # 상품 임베딩은 여기서 새로 만들지 않음!
         self.faiss_manager = FAISSIndexManager()
 
-        today_str = datetime.datetime.now().strftime("%Y-%m-%d")
+        yesterday_str = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     
 
         self.faiss_manager.auto_load_index(
             local_path='faiss.index',
             bucket="team6-mlops-bucket",
-            s3_key=f"faiss_index/{today_str}_index/faiss.index"
+            s3_key=f"faiss_index/{yesterday_str}_index/faiss.index"
         )
 
         # 저장소 및 saver 준비
