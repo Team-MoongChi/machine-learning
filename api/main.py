@@ -38,7 +38,7 @@ app.include_router(
     tags=["group_boards"]
 )
 
-# groupboard 라우터 추가
+# new user 라우터 추가
 app.include_router(
     new_user,
     prefix="/api/v1",
