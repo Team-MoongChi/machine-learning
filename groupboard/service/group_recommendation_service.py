@@ -34,7 +34,7 @@ class GroupRecommendationService:
 
     def upload_new_recommendation(self, s3_key: str, user_id: int, address: str, top_n: int = 6) -> list:
         """추천 생성 후 S3, OpenSearch에 모두 저장"""
-        rec = self.recommendation_engine.get_user_recommendations(user_id, address, top_n)
+        rec = self.recommendation_engine.get_new_user_recommendations(user_id, address, top_n)
         if rec is None:
             print(f"추천 생성 실패: user_id={user_id}")
             return None
