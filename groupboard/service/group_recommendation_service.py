@@ -9,6 +9,9 @@ from utils.storage.s3_manager import S3Manager
 from utils.storage.opensearch_manager import OpenSearchManager
 import json
 from config.opensearch_mappings import GROUP_RECOMMENDATION_MAPPING
+import logging
+
+logger = logging.getLogger(__name__)
 
 class GroupRecommendationService:
     """공구방 추천 서비스 메인 클래스"""
@@ -69,6 +72,7 @@ class GroupRecommendationService:
 
         for rec in all_recommendations:
             if rec is None:
+                logger.info("추천결과가 None입니다.")
                 continue
             user_id = rec.get("user_id")
             doc_id = f"user_{user_id}_{timestamp}"

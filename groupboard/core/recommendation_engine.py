@@ -4,7 +4,9 @@ from groupboard.processor.data_processor import DataProcessor
 from groupboard.processor.location_processor import LocationProcessor
 from groupboard.core.popularity_engine import PopularityEngine
 from config.group_board_config import TOP_N_GROUPS
+import logging
 
+logger = logging.getLogger(__name__)
 
 class RecommendationEngine:
     """공구방 추천 엔진 클래스"""
@@ -75,7 +77,7 @@ class RecommendationEngine:
         
         users_df = self.data_loader.users
         all_user_ids = users_df['user_id'].tolist()
-        print(len(all_user_ids))
+        logger.info(len(all_user_ids))
         
         recommendations = []
         
@@ -84,5 +86,5 @@ class RecommendationEngine:
             if result:
                 recommendations.append(result)
         
-        print(f"Total recommendations generated: {len(recommendations)}")
+        logger.info(f"Total recommendations generated: {len(recommendations)}")
         return recommendations
