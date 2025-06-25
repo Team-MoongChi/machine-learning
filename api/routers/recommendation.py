@@ -23,9 +23,7 @@ def get_recommendations(user_id: int):
     사용자별 추천 결과를 조회
     """
     try:
-        today = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        doc_id = f"user_{user_id}_{today}"
-        recommendations = service.get_recommendation_from_opensearch(doc_id)
+        recommendations = service.get_recommendation_from_opensearch(user_id)
         
         if not recommendations:
             raise HTTPException(
