@@ -37,7 +37,7 @@ class NewUserRecommendationService:
         # 저장소 및 saver 준비
         self.repository = RecommendationRepository(
             s3_bucket="team6-mlops-bucket",
-            opensearch_index="recommendations",
+            opensearch_index="recommendations-v2",
             mapping=PRODUCT_MAPPING
         )
         self.saver = RecommendationSaver()
