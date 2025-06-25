@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 @flow(name="product_flow")
-def prodcut_flow():
+def product_flow():
     logger.info("🚀 Starting product recommendation flow...")
 
     try:
