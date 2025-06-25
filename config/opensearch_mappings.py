@@ -27,16 +27,9 @@ PRODUCT_MAPPING = {
         "properties": {
             "doc_id": {"type": "keyword"},
             "user_id": {"type": "keyword"},
-            "recommended_item_ids": {
-                "type": "nested",
-                "properties": {
-                    "item_id": {"type": "keyword"},
-                    "score": {"type": "float"}
-                }
-            },
+            "recommended_item_ids": { "type": "keyword" },
             "experiment_id": {"type": "keyword"},
             "run_id": {"type": "keyword"}
         }
     }
 }
-
