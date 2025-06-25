@@ -35,9 +35,7 @@ PRODUCT_MAPPING = {
                 }
             },
             "experiment_id": {"type": "keyword"},
-            "run_id": {"type": "keyword"},
-            "created_at": {"type": "date"},
-            "updated_at": {"type": "date"}
+            "run_id": {"type": "keyword"}
         }
     }
 }
