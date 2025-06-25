@@ -1,5 +1,6 @@
 from product.service.recommendation_service import RecommendationService
 from product.service.new_user_recommendation_service import NewUserRecommendationService
+import datetime
 
 def test_delete_storage_data(service, s3_prefix: str):
     """S3와 OpenSearch의 기존 데이터 삭제"""
@@ -20,8 +21,7 @@ def test_run_full_pipeline(service):
 
 def test_get_recommendation(service, user_id):
     """추천 결과 조회 테스트"""
-
-    result = service.repository.get_from_opensearch(f"user_{user_id}")
+    result = service.repository.get_recommendation_from_opensearch(user_id)
     assert result is not None, f"추천 결과 조회 실패: user_id={user_id}"
     print(f"사용자 {user_id}의 추천 결과: {result}")
 
@@ -39,7 +39,7 @@ def run_all_tests():
 
     # 3. 추천 결과 조회 테스트 (예: user_id=5)
     print("\n3. 추천 결과 조회 테스트")
-    test_get_recommendation(service, user_id=204)
+    test_get_recommendation(service, user_id=180)
 
     print("\n===== 모든 RecommendationService 테스트 완료 =====")
 
@@ -47,10 +47,10 @@ if __name__ == "__main__":
     run_all_tests()
 
     new_user_info = {
-        'user_id' : 300,
-        'gender': 'MALE',
+        'user_id' : 250,
+        'gender': 'FEMALE',
         'birth': '2000-12-11',
-        'interestCategory': '생활용품'
+        'interestCategory': '신선식품'
     }
     service = NewUserRecommendationService()
     recommendations = service.recommend(new_user_info)
