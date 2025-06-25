@@ -4,7 +4,7 @@ from product.transformer.recommendation_transformer import RecommendationTransfo
 from config.opensearch_config import OPENSEARCH_CONFIG
 from typing import Dict, Any, Optional
 import logging
-import datetime
+from datetime import datetime, timedelta
 logger = logging.getLogger(__name__)
 
 class RecommendationRepository:
@@ -40,22 +40,51 @@ class RecommendationRepository:
             logger.error(f"Failed to save recommendation to S3: {str(e)}")
             return False
 
-    def get_from_opensearch(self, doc_id: str) -> Optional[Dict[str, Any]]:
-        """OpenSearch에서 추천 데이터 조회"""
+    
+def get_recommendation_from_opensearch(self, user_id: str) -> Dict:
+        """최근 14일 이내에 생성된 추천 결과 중 가장 최근 문서를 OpenSearch에서 조회"""
         try:
-            # OpenSearch에서 조회
-            core_data = self.opensearch.get(doc_id=doc_id)
+            query = {
+                "query": {
+                    "prefix": {
+                        "doc_id": f"user_{user_id}_"
+                    }
+                },
+                "sort": [{"doc_id": "desc"}],
+                "size": 1
+            }
 
-            print(core_data)
-            
-            if not core_data:
-                logger.warning(f"No recommendation found in OpenSearch: {doc_id}")
-                return None
-            
-            logger.info(f"Retrieved recommendation from OpenSearch: {core_data}")
-            # 백엔드 포맷으로 변환
-            return self.transformer.to_backend_format(core_data)
-            
+            result = self.opensearch.search(query)
+            hits = result.get("hits", {}).get("hits", [])
+
+            if hits:
+                source = hits[0]["_source"]
+                doc_id = source.get("doc_id", "")
+                parts = doc_id.split("_")
+
+                if len(parts) >= 4:
+                    date_str = parts[2]
+                    try:
+                        doc_date = datetime.strptime(date_str, "%Y%m%d")
+                        if doc_date >= datetime.now() - timedelta(days=14):
+                            return {
+                                "status": "success",
+                                "data": source,
+                                "timestamp": "_".join(parts[2:])  # '20250619_170604'
+                            }
+                    except ValueError:
+                        logging.warning(f"Invalid timestamp format in doc_id: {doc_id}")
+
+            return {
+                "status": "error",
+                "message": f"사용자 {user_id}의 최근 14일 추천 결과가 없습니다.",
+                "data": None
+            }
+
         except Exception as e:
-            logger.error(f"Error retrieving recommendation from OpenSearch: {str(e)}")
-            return None
+            logging.error(f"OpenSearch search error: {str(e)}")
+            return {
+                "status": "error",
+                "message": f"추천 결과 조회 실패: {str(e)}",
+                "data": None
+            }
