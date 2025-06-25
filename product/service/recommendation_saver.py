@@ -47,7 +47,7 @@ class RecommendationSaver:
         user_id = str(new_user_info.get('user_id', 'unknown'))
         experiment_id = 2
         run_id = f"run_id_{today}"
-        doc_id = doc_id = f"user_{user_id}_{today}"
+        doc_id = f"user_{user_id}_{today}"
 
         recommendation_data = {
             "user_id": user_id,
@@ -81,7 +81,7 @@ class RecommendationSaver:
 
         # S3 키 생성
         today = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        doc_id = doc_id = f"user_{user_id}_{today}"
+        doc_id = f"user_{user_id}_{today}"
         s3_key = f"recommendations/user_{user_id}/product_{today}.json"
         experiment_id = 2
         run_id = f"run_id_{today}"
@@ -97,5 +97,6 @@ class RecommendationSaver:
         repository.save_to_s3(s3_key=s3_key, recommendation_data=recommendation_data)
         repository.save_to_opensearch(doc_id, recommendation_data)
         print(f"기존 사용자 {user_id} 추천 결과 S3/Opensearch 저장 완료")
+        print(f"{doc_id}")
 
         return rec_result
