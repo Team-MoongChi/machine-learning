@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from product.repository.recommendation_repository import RecommendationRepository
 import logging
 from config.opensearch_mappings import PRODUCT_MAPPING
+import datetime
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -22,8 +23,9 @@ def get_recommendations(user_id: int):
     사용자별 추천 결과를 조회
     """
     try:
-        doc_id = f"user_{user_id}"
-        recommendations = service.get_from_opensearch(doc_id)
+        today = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        doc_id = f"user_{user_id}_{today}"
+        recommendations = service.get_recommendation_from_opensearch(doc_id)
         
         if not recommendations:
             raise HTTPException(
