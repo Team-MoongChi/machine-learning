@@ -1,13 +1,11 @@
-from prefect.blocks.system import Secret
+import os
+from dotenv import load_dotenv
 
-OPENSEARCH_HOST = Secret.load("opensearch-host",  _sync=True)
-OPENSEARCH_PORT = Secret.load("opensearch-port",  _sync=True)
-OPENSEARCH_USERNAME = Secret.load("opensearch-username",  _sync=True)
-OPENSEARCH_PASSWORD = Secret.load("opensearch-password",  _sync=True)
+load_dotenv()
 
 OPENSEARCH_CONFIG = {
-    "host": OPENSEARCH_HOST.get(),
-    "port": OPENSEARCH_PORT.get(),
-    "username": OPENSEARCH_USERNAME.get(),
-    "password": OPENSEARCH_PASSWORD.get()
+    "host": os.getenv("OPENSEARCH_HOST"),
+    "port": os.getenv("OPENSEARCH_PORT", 9200),
+    "username": os.getenv("OPENSEARCH_USERNAME", "admin"),
+    "password": os.getenv("OPENSEARCH_PASSWORD")
 }
