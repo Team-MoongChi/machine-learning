@@ -28,3 +28,21 @@ deployments:
           MYSQL_DATABASE: "{{  prefect.blocks.secret.mysql-database }}"
           MYSQL_USERNAME: "{{  prefect.blocks.secret.mysql-username }}"
           MYSQL_PASSWORD: "{{  prefect.blocks.secret.mysql-password }}"
+  
+  - name: product-flow
+    entrypoint: flows/product_flow.py:product_flow
+    work_pool:
+      name: default-work-pool
+      job_variables:
+        env:
+          OPENSEARCH_HOST: "{{ prefect.blocks.secret.opensearch-host }}"
+          OPENSEARCH_PORT: "{{  prefect.blocks.secret.opensearch-port }}"
+          OPENSEARCH_USERNAME: "{{  prefect.blocks.secret.opensearch-username }}"
+          OPENSEARCH_PASSWORD: "{{  prefect.blocks.secret.opensearch-password }}"
+          AWS_ACCESS_KEY_ID: "{{  prefect.blocks.secret.aws-access-key-id }}"
+          AWS_SECRET_ACCESS_KEY: "{{  prefect.blocks.secret.aws-secret-access-key }}"
+          MYSQL_URL: "{{  prefect.blocks.secret.mysql-url }}"
+          MYSQL_PORT: "{{  prefect.blocks.secret.mysql-port }}"
+          MYSQL_DATABASE: "{{  prefect.blocks.secret.mysql-database }}"
+          MYSQL_USERNAME: "{{  prefect.blocks.secret.mysql-username }}"
+          MYSQL_PASSWORD: "{{  prefect.blocks.secret.mysql-password }}"
