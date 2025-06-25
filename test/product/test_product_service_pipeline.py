@@ -13,6 +13,9 @@ def test_delete_storage_data(service, s3_prefix: str):
     deleted_os = service.repository.opensearch.delete_all()
     print(f"OpenSearch 삭제된 문서 수: {deleted_os}")
 
+    deleted_index = service.repository.opensearch.delete_index()
+    print(f"OpenSearch 인덱스 삭제 결과: {deleted_index}")
+
 def test_run_full_pipeline(service):
     """추천 파이프라인 전체 실행 (업로드)"""
 
