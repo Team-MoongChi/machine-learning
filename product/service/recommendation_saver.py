@@ -47,7 +47,7 @@ class RecommendationSaver:
         user_id = str(new_user_info.get('user_id', 'unknown'))
         experiment_id = 2
         run_id = f"run_id_{today}"
-        doc_id = f"user_{user_id}"
+        doc_id = doc_id = f"user_{user_id}_{today}"
 
         recommendation_data = {
             "user_id": user_id,
@@ -79,9 +79,9 @@ class RecommendationSaver:
         recommendations = engine.recommend(user_id, top_k=top_k)
         rec_result = recommendations.to_dict(orient='records')
 
-        doc_id = f"user_{user_id}"
         # S3 키 생성
         today = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        doc_id = doc_id = f"user_{user_id}_{today}"
         s3_key = f"recommendations/user_{user_id}/product_{today}.json"
         experiment_id = 2
         run_id = f"run_id_{today}"
