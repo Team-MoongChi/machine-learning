@@ -38,14 +38,13 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-    - name: Build and push Docker image
+    - name: Build and push Docker image (No Cache)
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/ml-api:latest
-        cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/ml-api:latest
-        cache-to: type=inline
+        no-cache: true
         platforms: linux/amd64
 
     - name: Deploy to EC2
