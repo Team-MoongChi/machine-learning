@@ -23,7 +23,7 @@ def get_recommendations(user_id: int):
     사용자별 추천 결과를 조회
     """
     try:
-        recommendations = service.get_recommendation_from_opensearch(user_id)
+        recommendations = service.get_recommendation_from_opensearch(str(user_id))
         
         if not recommendations:
             raise HTTPException(
