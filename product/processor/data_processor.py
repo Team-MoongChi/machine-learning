@@ -3,18 +3,20 @@ import json
 import pandas as pd
 from typing import Tuple, List, Optional, Dict
 from utils.storage.mysql_manager import MySQLManager
+from utils.storage.s3_manager import S3Manager
 
 class DataProcessor:
     """데이터 로드 및 전처리 담당 클래스"""
-    def __init__(self, file_path: str = "data/user_activity_logs_final_.json"):
+    def __init__(self):
         self.mysql = MySQLManager()
-        self.file_path = file_path
+        self.s3manager = S3Manager("team6-mlops-bucket")
         self.products = None
         self.categories = None
         self.users = None
         self.favorite_products = None
         self.search_logs = None
         self.click_logs = None
+        self.key = f"logs/user_activity_logs_final.json"
         
     def load_db_data(self) -> bool:
         """백엔드 MySQL에서 데이터 추출해서 반환"""
@@ -43,8 +45,7 @@ class DataProcessor:
         """
         # 파일 포맷 판별
         try:
-            with open(self.file_path, 'r', encoding='utf-8') as f:
-                logs = json.load(f)
+            logs = self.s3manager.download(self.key)
         except Exception as e:
             print(f"[ERROR] 로그 파일 읽기 실패: {e}")
             return pd.DataFrame(), pd.DataFrame()
