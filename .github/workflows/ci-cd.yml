@@ -45,6 +45,12 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+    - name: Prefect Auth
+      uses: PrefectHQ/actions-prefect-auth@v1
+      with:
+        prefect-api-key: ${{ secrets.PREFECT_API_KEY }}
+        prefect-workspace: ${{ secrets.PREFECT_WORKSPACE }}
+        
     # 고유 태그로 이미지 빌드 및 푸시
     - name: Build and push Docker image (No Cache)
       uses: docker/build-push-action@v5
