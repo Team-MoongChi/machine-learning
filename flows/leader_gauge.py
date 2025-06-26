@@ -151,3 +151,26 @@ def validate_db_update(result):
         return True
     logger.error("❌ 데이터베이스 업데이트 검증 실패")
     return False
+
+@flow
+def test_complete_pipeline_flow():
+    logger = get_run_logger()
+    logger.info("=== 전체 파이프라인 통합 테스트 시작 ===")
+    service, result = run_pipeline()
+    validations = [
+        validate_data_loading(service),
+        validate_feature_engineering(service),
+        validate_target_generation(service),
+        validate_model_training(service),
+        validate_model_evaluation(result),
+        validate_db_update(result),
+    ]
+    passed = sum(validations)
+    total = len(validations)
+    logger.info(f"\n📊 세부 검증 결과: {passed}/{total} 성공")
+    if passed == total:
+        logger.info("✅ 전체 파이프라인 통합 테스트 성공")
+        return True
+    else:
+        logger.warning("⚠️ 일부 검증이 실패했지만 파이프라인은 완료됨")
+        return False
