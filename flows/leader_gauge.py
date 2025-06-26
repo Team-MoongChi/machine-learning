@@ -25,3 +25,21 @@ def database_connection():
     except Exception as e:
         logger.error(f"❌ 데이터베이스 연결 테스트 실패: {e}")
         return False
+
+@task
+def test_manner_percents_table():
+    logger = get_run_logger()
+    logger.info("=== manner_percents 테이블 테스트 시작 ===")
+    try:
+        db_manager = DBManager()
+        db_manager.connect()
+        result = db_manager.execute_query("DESCRIBE manner_percents")
+        assert result is not None, "manner_percents 테이블에 접근할 수 없습니다"
+        count_result = db_manager.execute_query("SELECT COUNT(*) as count FROM manner_percents")
+        record_count = count_result[0]['count'] if count_result else 0
+        db_manager.disconnect()
+        logger.info(f"✅ manner_percents 테이블 테스트 성공 - 기존 레코드 수: {record_count}")
+        return True
+    except Exception as e:
+        logger.error(f"❌ manner_percents 테이블 테스트 실패: {e}")
+        return False
