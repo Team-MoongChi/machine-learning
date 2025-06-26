@@ -43,3 +43,9 @@ def test_manner_percents_table():
     except Exception as e:
         logger.error(f"❌ manner_percents 테이블 테스트 실패: {e}")
         return False
+    
+@task
+def run_pipeline():
+    service = GaugeService()
+    result = service.run_full_pipeline()
+    return service, result
