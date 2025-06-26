@@ -49,3 +49,12 @@ def run_pipeline():
     service = GaugeService()
     result = service.run_full_pipeline()
     return service, result
+
+@task
+def validate_data_loading(service):
+    logger = get_run_logger()
+    if hasattr(service, 'merged_all') and service.merged_all is not None and not service.merged_all.empty:
+        logger.info(f"✅ 데이터 로딩 검증 성공 - 데이터 크기: {service.merged_all.shape}")
+        return True
+    logger.error("❌ 데이터 로딩 검증 실패")
+    return False
