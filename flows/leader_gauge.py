@@ -123,3 +123,22 @@ def validate_model_training(service):
         return True
     logger.error("❌ 모델 훈련 검증 실패")
     return False
+
+@task
+def validate_model_evaluation(result):
+    logger = get_run_logger()
+    if 'results' in result and result['results']:
+        evaluation_ok = False
+        if 'leader_evaluation' in result['results']:
+            leader_metrics = result['results']['leader_evaluation']['metrics']
+            if 'mae' in leader_metrics and 'r2' in leader_metrics:
+                evaluation_ok = True
+                logger.info(f"✅ 리더 모델 평가 검증 성공 - MAE: {leader_metrics['mae']:.4f}, R²: {leader_metrics['r2']:.4f}")
+        if 'follower_evaluation' in result['results']:
+            follower_metrics = result['results']['follower_evaluation']['metrics']
+            if 'mae' in follower_metrics and 'r2' in follower_metrics:
+                evaluation_ok = True
+                logger.info(f"✅ 팔로워 모델 평가 검증 성공 - MAE: {follower_metrics['mae']:.4f}, R²: {follower_metrics['r2']:.4f}")
+        return evaluation_ok
+    logger.error("❌ 모델 평가 검증 실패")
+    return False
