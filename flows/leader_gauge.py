@@ -152,8 +152,8 @@ def validate_db_update(result):
     logger.error("❌ 데이터베이스 업데이트 검증 실패")
     return False
 
-@flow
-def test_complete_pipeline_flow():
+@flow(name="leader_flow")
+def leader_flow():
     logger = get_run_logger()
     logger.info("=== 전체 파이프라인 통합 테스트 시작 ===")
     service, result = run_pipeline()
