@@ -81,3 +81,26 @@ def validate_feature_engineering(service):
         return True
     logger.error("❌ 피처 생성 검증 실패")
     return False
+
+@task
+def validate_target_generation(service):
+    logger = get_run_logger()
+    leader_targets_ok = False
+    follower_targets_ok = False
+
+    if hasattr(service, 'leader_data') and 'leader_degree' in service.leader_data.columns:
+        leader_scores = service.leader_data['leader_degree']
+        if leader_scores.min() >= 0 and leader_scores.max() <= 100:
+            leader_targets_ok = True
+            logger.info(f"✅ 리더 타겟 생성 검증 성공 - 평균 점수: {leader_scores.mean():.2f}")
+
+    if hasattr(service, 'follower_data') and 'participant_degree' in service.follower_data.columns:
+        follower_scores = service.follower_data['participant_degree']
+        if follower_scores.min() >= 0 and follower_scores.max() <= 100:
+            follower_targets_ok = True
+            logger.info(f"✅ 팔로워 타겟 생성 검증 성공 - 평균 점수: {follower_scores.mean():.2f}")
+
+    if leader_targets_ok or follower_targets_ok:
+        return True
+    logger.error("❌ 타겟 생성 검증 실패")
+    return False
