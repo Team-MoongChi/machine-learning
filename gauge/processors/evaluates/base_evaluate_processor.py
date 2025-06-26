@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-import matplotlib.pyplot as plt
-import seaborn as sns
+# import matplotlib.pyplot as plt
+# import seaborn as sns
 
 class BaseEvaluateProcessor:
   """
@@ -56,32 +56,32 @@ class BaseEvaluateProcessor:
 
     return metrics
 
-  def plot_predictions(self, figsize=(12, 5)):
-    """
-    예측 결과 시각화
+  # def plot_predictions(self, figsize=(12, 5)):
+  #   """
+  #   예측 결과 시각화
 
-    Args:
-        figsize: 그래프 크기
-    """
-    fig, axes = plt.subplots(1, 2, figsize=figsize)
+  #   Args:
+  #       figsize: 그래프 크기
+  #   """
+  #   fig, axes = plt.subplots(1, 2, figsize=figsize)
 
-    # 실제값 vs 예측값 산점도
-    axes[0].scatter(self.y_true, self.y_pred, alpha=0.6)
-    axes[0].plot([self.y_true.min(), self.y_true.max()], [self.y_true.min(), self.y_true.max()], 'r--', lw=2)
-    axes[0].set_xlabel('실제값')
-    axes[0].set_ylabel('예측값')
-    axes[0].set_title('실제값 vs 예측값')
+  #   # 실제값 vs 예측값 산점도
+  #   axes[0].scatter(self.y_true, self.y_pred, alpha=0.6)
+  #   axes[0].plot([self.y_true.min(), self.y_true.max()], [self.y_true.min(), self.y_true.max()], 'r--', lw=2)
+  #   axes[0].set_xlabel('실제값')
+  #   axes[0].set_ylabel('예측값')
+  #   axes[0].set_title('실제값 vs 예측값')
 
-    # 잔차 히스토그램
-    residuals = self.y_true - self.y_pred
-    axes[1].hist(residuals, bins=30, alpha=0.7)
-    axes[1].set_xlabel('잔차 (실제값 - 예측값)')
-    axes[1].set_ylabel('빈도')
-    axes[1].set_title('잔차 분포')
-    axes[1].axvline(x=0, color='r', linestyle='--')
+  #   # 잔차 히스토그램
+  #   residuals = self.y_true - self.y_pred
+  #   axes[1].hist(residuals, bins=30, alpha=0.7)
+  #   axes[1].set_xlabel('잔차 (실제값 - 예측값)')
+  #   axes[1].set_ylabel('빈도')
+  #   axes[1].set_title('잔차 분포')
+  #   axes[1].axvline(x=0, color='r', linestyle='--')
 
-    plt.tight_layout()
-    plt.show()
+  #   plt.tight_layout()
+  #   plt.show()
 
   def analyze_prediction_distribution(self):
     """예측값 분포 분석"""
