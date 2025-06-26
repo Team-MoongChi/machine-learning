@@ -12,7 +12,7 @@ RUN apt-get update && \
 COPY requirements.txt .
 
 # 패키지 설치 (캐시 활용)
-RUN pip install --user --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 2단계: 실행용 베이스 이미지
 FROM python:3.12-slim
@@ -22,9 +22,8 @@ WORKDIR /app
 # 빌더에서 설치한 패키지 복사 
 COPY --from=builder /root/.local /root/.local
 
-# 환경변수로 PATH 추가 
-ENV PATH=/root/.local/bin:$PATH \
-    PYTHONUNBUFFERED=1 \
+# 환경변수
+ENV PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app \
     PORT=8000
 
