@@ -142,3 +142,12 @@ def validate_model_evaluation(result):
         return evaluation_ok
     logger.error("❌ 모델 평가 검증 실패")
     return False
+
+@task
+def validate_db_update(result):
+    logger = get_run_logger()
+    if result.get('update_count', 0) > 0:
+        logger.info(f"✅ 데이터베이스 업데이트 검증 성공 - 업데이트 건수: {result['update_count']}")
+        return True
+    logger.error("❌ 데이터베이스 업데이트 검증 실패")
+    return False
