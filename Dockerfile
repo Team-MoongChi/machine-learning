@@ -19,8 +19,10 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# 빌더에서 설치한 패키지 복사 
-COPY --from=builder /app /app
+# 빌더에서 패키지와 바이너리 복사
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
 
 # 환경변수
 ENV PYTHONUNBUFFERED=1 \
