@@ -104,3 +104,22 @@ def validate_target_generation(service):
         return True
     logger.error("❌ 타겟 생성 검증 실패")
     return False
+
+@task
+def validate_model_training(service):
+    logger = get_run_logger()
+    leader_training_ok = False
+    follower_training_ok = False
+
+    if hasattr(service, 'leader_data') and 'new_leader_degree' in service.leader_data.columns:
+        leader_training_ok = True
+        logger.info("✅ 리더 모델 훈련 검증 성공")
+
+    if hasattr(service, 'follower_data') and 'new_participant_degree' in service.follower_data.columns:
+        follower_training_ok = True
+        logger.info("✅ 팔로워 모델 훈련 검증 성공")
+
+    if leader_training_ok or follower_training_ok:
+        return True
+    logger.error("❌ 모델 훈련 검증 실패")
+    return False
