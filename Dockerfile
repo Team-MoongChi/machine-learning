@@ -20,7 +20,7 @@ FROM python:3.12-slim
 WORKDIR /app
 
 # 빌더에서 설치한 패키지 복사 
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /app /app
 
 # 환경변수
 ENV PYTHONUNBUFFERED=1 \
