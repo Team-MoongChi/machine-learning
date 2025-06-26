@@ -43,6 +43,7 @@ class RecommendationRepository:
     
     def get_recommendation_from_opensearch(self, user_id: str) -> Dict:
             """최근 14일 이내에 생성된 추천 결과 중 가장 최근 문서를 OpenSearch에서 조회"""
+            logger.info(f"user_id is {user_id}")
             try:
                 query = {
                     "query": {
@@ -54,8 +55,10 @@ class RecommendationRepository:
                     "size": 1
                 }
 
+                logger.info(query)
+
                 result = self.opensearch.search(query)
-                print(result)
+                logger.info(result)
                 hits = result.get("hits", {}).get("hits", [])
 
                 if hits:
@@ -68,6 +71,7 @@ class RecommendationRepository:
                         try:
                             doc_date = datetime.strptime(date_str, "%Y%m%d")
                             if doc_date >= datetime.now() - timedelta(days=14):
+                                logger.info(source)
                                 return {
                                     "status": "success",
                                     "data": source,

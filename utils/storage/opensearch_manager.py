@@ -25,15 +25,15 @@ class OpenSearchManager:
             print(f"Creating index {self.index} if it does not exist...")
             # 인덱스 존재 여부 확인
             if self.client.indices.exists(index=self.index):
-                logging.info(f"Index {self.index} already exists")
+                print(f"Index {self.index} already exists")
                 return True
                 
             response = self.client.indices.create(index=self.index, body=self.mapping)
-            logging.info(f"Created new index {self.index}")
+            print(f"Created new index {self.index}")
             return True
             
         except Exception as e:
-            logging.error(f"Failed to create index {self.index}: {str(e)}")
+            print(f"Failed to create index {self.index}: {str(e)}")
             return False
     
     # 인덱스 타입 자동 추론돼서 에러 발생 
@@ -97,7 +97,13 @@ class OpenSearchManager:
     def delete_index(self) -> bool:
         """인덱스 전체 삭제"""
         try:
-            response = self.client.indices.delete(index=self.index)
-            return True
+            if self.client.indices.exists(index=self.index):
+                response = self.client.indices.delete(index=self.index)
+                print(f"[INFO] 인덱스 '{self.index}' 삭제 완료: {response}")
+                return response.get("acknowledged", False)
+            else:
+                print(f"[INFO] 인덱스 '{self.index}' 존재하지 않음.")
+                return True
         except Exception as e:
+            print(f"[ERROR] 인덱스 삭제 실패: {e}")
             return False

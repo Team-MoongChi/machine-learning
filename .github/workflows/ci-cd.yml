@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [ main, fix/package-error ]
+    branches: [ main, fix/product-api ]
   pull_request:
     branches: [ main ]
 
@@ -10,16 +10,41 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      DOCKER_BUILDKIT: 1  # BuildKit 활성화
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Print start log
+      run: echo "🚀 [START] CI/CD Workflow started!"
+
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+    - name: Print cache status
+      run: echo "🗄️ [CACHE] Docker layer cache step completed."
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+    - name: Print buildx status
+      run: echo "🔧 [BUILDX] Docker Buildx set up completed."
+
+    - name: Set Docker image tag
+      id: vars
+      run: |
+        echo "🏷️ [TAG] Setting Docker image tag to first 7 chars of GITHUB_SHA."
+        echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        echo "TAG=${GITHUB_SHA::7}"
 
     - name: Create .env file
       run: |
-        echo "📝 Creating .env file..."
+        echo "📝 [ENV] Creating .env file with secrets."
         echo "OPENSEARCH_USERNAME=${{ secrets.OPENSEARCH_USERNAME }}" >> .env
         echo "OPENSEARCH_HOST=${{ secrets.OPENSEARCH_HOST }}" >> .env
         echo "OPENSEARCH_PORT=${{ secrets.OPENSEARCH_PORT }}" >> .env
@@ -31,22 +56,39 @@ jobs:
         echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env
         echo "MYSQL_USERNAME=${{ secrets.MYSQL_USERNAME }}" >> .env
         echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
+        echo "PREFECT_API_URL=${{ secrets.PREFECT_API_URL }}" >> .env
+        echo "PREFECT_API_KEY=${{ secrets.PREFECT_API_KEY }}" >> .env
+
+    - name: Print .env status
+      run: echo "✅ [.ENV] .env file created."
 
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    - name: Print Docker login status
+      run: echo "🔑 [DOCKER] Docker Hub login successful."
+
+    - name: Prefect Auth
+      uses: PrefectHQ/actions-prefect-auth@v1
+      with:
+        prefect-api-key: ${{ secrets.PREFECT_API_KEY }}
+        prefect-workspace: ${{ secrets.PREFECT_WORKSPACE }}
+    - name: Print Prefect auth status
+      run: echo "🔗 [PREFECT] Prefect authentication completed."
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
         context: .
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/ml-api:latest
-        cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/ml-api:latest
-        cache-to: type=inline
+        tags: |
+          ${{ secrets.DOCKERHUB_USERNAME }}/ml-api:${{ env.TAG }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/ml-api:latest
         platforms: linux/amd64
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
 
     - name: Deploy to EC2
       uses: appleboy/ssh-action@master
@@ -54,45 +96,48 @@ jobs:
         host: ${{ secrets.EC2_HOST }}
         username: ubuntu
         key: ${{ secrets.EC2_SSH_KEY }}
-        envs: DOCKERHUB_USERNAME
+        envs: DOCKERHUB_USERNAME, TAG
         script: |
-          echo "🚀 Starting deployment process..."
+          echo "🚀 [DEPLOY] Starting deployment process on EC2..."
 
-          echo "🔐 Logging into Docker..."
+          echo "🔐 [DEPLOY] Logging into Docker Hub on EC2..."
           docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
 
-          echo "📦 Pulling latest image..."
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ml-api:latest
+          echo "📦 [DEPLOY] Pulling latest image..."
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/ml-api:${TAG}
 
-          echo "🛑 Checking if container exists..."
+          echo "🛑 [DEPLOY] Checking if old container exists..."
           if docker container inspect ml-api >/dev/null 2>&1; then
-            echo "🧼 Stopping and removing old container..."
+            echo "🧼 [DEPLOY] Stopping and removing old container..."
             docker stop -t 30 ml-api || true
             docker rm ml-api || true
           else
-            echo "✅ No existing ml-api container."
+            echo "✅ [DEPLOY] No existing ml-api container."
           fi
 
-          echo "🧹 Docker system cleanup (optional)..."
+          echo "🧹 [DEPLOY] Docker system cleanup (optional)..."
           docker system prune -f
 
-          echo "📝 Validating .env file..."
+          echo "📝 [DEPLOY] Validating .env file on EC2..."
           if [ ! -f "/home/ubuntu/machine-learning/.env" ]; then
-            echo "⚠️ /home/ubuntu/machine-learning/.env not found. Creating empty .env..."
+            echo "⚠️ [DEPLOY] .env file not found. Creating empty .env..."
             mkdir -p /home/ubuntu/machine-learning
             touch /home/ubuntu/machine-learning/.env
           fi
 
-          echo "🚀 Starting new container..."
+          echo "🚀 [DEPLOY] Starting new container..."
           docker run -d \
             --name ml-api \
             -p 8000:8000 \
             --restart unless-stopped \
             --env-file /home/ubuntu/machine-learning/.env \
-            ${{ secrets.DOCKERHUB_USERNAME }}/ml-api:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/ml-api:${TAG}
 
-          echo "📋 Container status:"
-          docker ps -a | grep ml-api || echo "❌ ml-api container not found"
+          echo "📋 [DEPLOY] Container status:"
+          docker ps -a | grep ml-api || echo "❌ [DEPLOY] ml-api container not found"
 
-          echo "📄 Container logs:"
-          docker logs ml-api || echo "⚠️ Failed to retrieve logs. Container may have exited early."
+          echo "📄 [DEPLOY] Container logs:"
+          docker logs ml-api || echo "⚠️ [DEPLOY] Failed to retrieve logs. Container may have exited early."
+
+    - name: Print finish log
+      run: echo "✅ [FINISH] CI/CD Workflow completed!"

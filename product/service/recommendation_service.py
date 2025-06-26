@@ -30,7 +30,7 @@ class RecommendationService:
         self.engine = None
         self.repository = RecommendationRepository(
             s3_bucket="team6-mlops-bucket",
-            opensearch_index="recommendations",
+            opensearch_index="recommendations-v2",
             mapping=PRODUCT_MAPPING
         )
     

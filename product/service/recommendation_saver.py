@@ -78,9 +78,11 @@ class RecommendationSaver:
         # 추천 엔진 실행
         recommendations = engine.recommend(user_id, top_k=top_k)
         rec_result = recommendations.to_dict(orient='records')
+        
 
         # S3 키 생성
-        today = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        now = datetime.datetime.now()
+        today = now.strftime("%Y%m%d_%H%M%S")
         doc_id = f"user_{user_id}_{today}"
         s3_key = f"recommendations/user_{user_id}/product_{today}.json"
         experiment_id = 2
