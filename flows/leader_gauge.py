@@ -58,3 +58,26 @@ def validate_data_loading(service):
         return True
     logger.error("❌ 데이터 로딩 검증 실패")
     return False
+
+@task
+def validate_feature_engineering(service):
+    logger = get_run_logger()
+    leader_features_ok = False
+    follower_features_ok = False
+
+    if hasattr(service, 'leader_data') and not service.leader_data.empty:
+        required_leader_features = ['leader_role_count', 'positive_keyword_count', 'review_score_normalized']
+        if all(col in service.leader_data.columns for col in required_leader_features):
+            leader_features_ok = True
+            logger.info(f"✅ 리더 피처 생성 검증 성공 - 데이터 크기: {service.leader_data.shape}")
+
+    if hasattr(service, 'follower_data') and not service.follower_data.empty:
+        required_follower_features = ['participant_role_count', 'positive_keyword_count', 'review_score_normalized']
+        if all(col in service.follower_data.columns for col in required_follower_features):
+            follower_features_ok = True
+            logger.info(f"✅ 팔로워 피처 생성 검증 성공 - 데이터 크기: {service.follower_data.shape}")
+
+    if leader_features_ok or follower_features_ok:
+        return True
+    logger.error("❌ 피처 생성 검증 실패")
+    return False
